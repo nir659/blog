@@ -1,65 +1,65 @@
-import Image from "next/image";
+import { Main } from "@/app/components/home";
+import { PostListSection } from "@/app/components/post-list";
+import { SiteFooter } from "@/app/components/site-footer";
+import { Space_Mono } from "next/font/google";
 
-export default function Home() {
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+});
+
+const navLinks = [
+  { href: "#about", label: "About" },
+  { href: "#archive", label: "Archive" },
+  { href: "#contact", label: "Contact" },
+];
+
+const posts = [
+  {
+    href: "/ctf",
+    title: "CTF: ",
+    excerpt: "Notes on CTF challenges and how to solve them.",
+  },
+  {
+    href: "/dev",
+    title: "Development: ",
+    excerpt: "Notes on development and how to solve them.",
+  },
+  {
+    href: "/security",
+    title: "Security: ",
+    excerpt: "Notes on security and how to secure systems.",
+  },
+  {
+    href: "/other",
+    title: "Other: ",
+    excerpt: "other stuff",
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main
+      className={`${spaceMono.className} flex min-h-screen justify-center px-4 sm:px-6`}
+    >
+      {/* To increase the overall width, you can raise the max-w value here from max-w-[1200px] to a higher value such as max-w-[1400px] */}
+      <div className="grid w-full max-w-[2000px] grid-cols-1 md:grid-cols-[minmax(3rem,1fr)_1px_minmax(0,1800px)_1px_minmax(3rem,1fr)] md:gap-x-[clamp(2rem,6vw,4rem)]">
+        {/* If you want to make the content column wider, increase the 820px in minmax(0,820px) above */}
+        <span
+          aria-hidden="true"
+          className="hidden self-stretch bg-[var(--grid-lines)] md:col-start-2 md:block"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        <section className="col-start-1 flex flex-col gap-[clamp(2rem,6vw,3.5rem)] py-[clamp(3rem,8vw,2rem)] md:col-start-3">
+          <Main navLinks={navLinks} />
+          <PostListSection posts={posts} />
+          <SiteFooter />
+        </section>
+        <span
+          aria-hidden="true"
+          className="hidden self-stretch bg-[var(--grid-lines)] md:col-start-4 md:block"
+        />
+      </div>
+    </main>
   );
 }
