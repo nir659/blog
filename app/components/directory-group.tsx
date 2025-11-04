@@ -7,6 +7,7 @@ type DirectoryGroupProps = {
   posts: PostSummary[];
   isOpen: boolean;
   onToggle: () => void;
+  onPostSelect?: (slug: string) => void;
 };
 
 function FolderClosedIcon() {
@@ -32,6 +33,7 @@ export function DirectoryGroup({
   posts,
   isOpen,
   onToggle,
+  onPostSelect,
 }: DirectoryGroupProps) {
   const contentId = `directory-content-${category
     .toLowerCase()
@@ -43,10 +45,10 @@ export function DirectoryGroup({
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={contentId}
-        className="flex w-full items-center gap-3 py-3 px-4 text-left transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70"
+        className="flex w-full items-center gap-3 py-3 px-4 text-left transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70 cursor-pointer"
       >
         <FolderClosedIcon />
-        <span className="text-[0.95rem] font-normal">{category}/</span>
+        <span className="font-normal">{category}/</span>
       </button>
 
       <div
@@ -63,9 +65,9 @@ export function DirectoryGroup({
               {posts.map((post, index) => (
                 <li key={post.slug || `${post.category}-${index}`}>
                   {post.slug ? (
-                    <a
-                      href={post.slug}
-                      className="block text-[0.9rem] transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70"
+                    <button
+                      onClick={() => onPostSelect?.(post.slug!)}
+                      className="block w-full text-left text-[0.9rem] transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70 cursor-pointer"
                     >
                       {post.title || post.category}
                       {post.date && (
@@ -73,7 +75,7 @@ export function DirectoryGroup({
                           {post.date}
                         </span>
                       )}
-                    </a>
+                    </button>
                   ) : (
                     <span className="block text-[0.9rem] opacity-70">
                       {post.title || post.category}

@@ -7,9 +7,10 @@ import { DirectoryGroup } from "./directory-group";
 
 type DirectoryPostListProps = {
   posts: PostSummary[];
+  onPostSelect?: (slug: string) => void;
 };
 
-export function DirectoryPostList({ posts }: DirectoryPostListProps) {
+export function DirectoryPostList({ posts, onPostSelect }: DirectoryPostListProps) {
   const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   if (posts.length === 0) {
@@ -20,7 +21,6 @@ export function DirectoryPostList({ posts }: DirectoryPostListProps) {
   const categories = Object.keys(groupedPosts);
 
   const handleToggle = (category: string) => {
-    // Accordion behavior: if already open, close it; otherwise open it
     setOpenCategory((prev) => (prev === category ? null : category));
   };
 
@@ -33,6 +33,7 @@ export function DirectoryPostList({ posts }: DirectoryPostListProps) {
           posts={groupedPosts[category]}
           isOpen={openCategory === category}
           onToggle={() => handleToggle(category)}
+          onPostSelect={onPostSelect}
         />
       ))}
     </section>
