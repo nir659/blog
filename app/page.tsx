@@ -1,6 +1,5 @@
 import { Main } from "@/app/components/home";
-import { PostListSection } from "@/app/components/post-list";
-import { SiteFooter } from "@/app/components/site-footer";
+import { DirectoryPostList } from "@/app/components/directory-post-list";
 import { Space_Mono } from "next/font/google";
 
 const spaceMono = Space_Mono({
@@ -17,24 +16,16 @@ const navLinks = [
 
 const posts = [
   {
-    href: "/ctf",
-    title: "CTF: ",
-    excerpt: "Notes on CTF challenges and how to solve them.",
+    category: "CTF",
   },
   {
-    href: "/dev",
-    title: "Development: ",
-    excerpt: "Notes on development and how to solve them.",
+    category: "Development",
   },
   {
-    href: "/security",
-    title: "Security: ",
-    excerpt: "Notes on security and how to secure systems.",
+    category: "Security",
   },
   {
-    href: "/other",
-    title: "Other: ",
-    excerpt: "other stuff",
+    category: "Other",
   },
 ];
 
@@ -44,7 +35,7 @@ export default function HomePage() {
       className={`${spaceMono.className} flex min-h-screen justify-center px-4 sm:px-6`}
     >
       {/* To increase the overall width, you can raise the max-w value here from max-w-[1200px] to a higher value such as max-w-[1400px] */}
-      <div className="grid w-full max-w-[2000px] grid-cols-1 md:grid-cols-[minmax(3rem,1fr)_1px_minmax(0,1800px)_1px_minmax(3rem,1fr)] md:gap-x-[clamp(2rem,6vw,4rem)]">
+      <div className="grid w-full max-w-[1600px] grid-cols-1 md:grid-cols-[minmax(3rem,1fr)_1px_minmax(0,1800px)_1px_minmax(3rem,1fr)] md:gap-x-[clamp(2rem,6vw,4rem)]">
         {/* If you want to make the content column wider, increase the 820px in minmax(0,820px) above */}
         <span
           aria-hidden="true"
@@ -52,8 +43,7 @@ export default function HomePage() {
         />
         <section className="col-start-1 flex flex-col gap-[clamp(2rem,6vw,3.5rem)] py-[clamp(3rem,8vw,2rem)] md:col-start-3">
           <Main navLinks={navLinks} />
-          <PostListSection posts={posts} />
-          <SiteFooter />
+          <DirectoryPostList posts={posts} />
         </section>
         <span
           aria-hidden="true"

@@ -13,16 +13,16 @@
 - `npm run lint` — run ESLint with the Next.js Core Web Vitals ruleset; fix lint issues before opening a PR.
 
 ## Coding Style & Naming Conventions
-- Default to TypeScript (`.tsx` for React, `.ts` for helpers) and keep props strongly typed.
+- Default to TypeScript (`.tsx` for React, `.ts` for helpers); type props explicitly.
 - Honor 2-space indentation and the Next.js/Prettier defaults.
 - Components and hooks use PascalCase, helpers camelCase, constants SCREAMING_SNAKE_CASE.
 - Name nested routes after the URL (e.g. `app/(posts)/archive/page.tsx`) and co-locate related components beside the route.
-- Tailwind strings should cluster layout → spacing → typography; reach for `clsx` once a list feels unwieldy.
+- Cluster Tailwind classes by layout → spacing → typography and reach for `clsx` once a list grows long.
 
 ## Testing Guidelines
 - No automated suite ships yet, so pair any feature with tests in the same PR.
 - Favor Vitest + React Testing Library placed in `__tests__/` folders next to the code under test.
-- Use snapshots sparingly for layout atoms; higher-level tests should cover flows like rendering the latest posts.
+- Use snapshots sparingly for layout atoms and cover flows like rendering the latest posts with integration tests.
 - Capture manual QA steps in the PR until CI is wired up.
 
 ## Commit & Pull Request Guidelines
@@ -35,4 +35,3 @@
 ## Environment & Configuration Tips
 - Store secrets in `.env.local` and document keys in the PR when they change.
 - Note asset sources (fonts, images) in the PR and prefer CDN links over binary commits.
-- When tweaking build settings, leave a short comment in `next.config.ts` describing the intent for future contributors.

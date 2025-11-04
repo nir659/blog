@@ -1,7 +1,13 @@
-type PostSummary = {
-  href: string;
-  title: string;
-  excerpt: string;
+export type PostSummary = {
+  category: string;
+  title?: string;
+  slug?: string;
+  date?: string;
+  description?: string;
+};
+
+export type GroupedPosts = {
+  [category: string]: PostSummary[];
 };
 
 type PostListProps = {
@@ -19,17 +25,8 @@ export function PostListSection({ posts }: PostListProps) {
       id="archive"
     >
       {posts.map((post) => (
-        <article
-          key={post.href}
-          className="border border-white/[0.08] bg-white/[0.01] p-[clamp(1.5rem,4vw,2rem)] transition-colors duration-150 hover:border-white/[0.15] hover:bg-white/[0.03]"
-        >
-          <a className="mt-3 block no-underline" href={post.href}>
-            <h3 className="mb-3 text-[1.2rem] font-semibold">{post.title}</h3>
-            <p className="mb-5 leading-[1.6] opacity-80">{post.excerpt}</p>
-            <span className="text-[0.85rem] uppercase tracking-[0.14em] opacity-70">
-              Open notes →
-            </span>
-          </a>
+        <article key={post.title} className="p-[clamp(1.5rem,4vw,2rem)]">
+          <h3 className="mb-3 text-[1.2rem] font-semibold">{post.title}</h3>
         </article>
       ))}
     </section>
