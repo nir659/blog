@@ -2,8 +2,6 @@
 
 A minimal, dark landing page for Markdown content built with Next.js and TypeScript.
 
-![Homepage screenshot](public/screenshots/home.png)
-
 ## Features
 - Directory-based Markdown publishing under `app/posts`
 - Live-rendered posts and dynamic archive powered by the App Router
