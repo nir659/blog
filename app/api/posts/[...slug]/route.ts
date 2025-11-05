@@ -4,9 +4,9 @@ import { getPostContent } from "@/app/lib/getPostContent";
 // api route to serve markdown post content from nested directories
 export async function GET(
   _request: NextRequest,
-  context: { params: Promise<{ slug: string[] }> }
+  { params }: { params: Promise<{ slug?: string[] }> }
 ) {
-  const { slug } = await context.params;
+  const { slug } = await params;
   const slugSegments = Array.isArray(slug) ? slug : [];
 
   if (!slugSegments || slugSegments.length === 0) {

@@ -1,4 +1,7 @@
+import "server-only";
+
 import { readdir } from "fs/promises";
+import { cache } from "react";
 import { join } from "path";
 
 export type PostMeta = {
@@ -76,7 +79,7 @@ async function readDirectory(pathSegments: string[]): Promise<DirectoryMeta[]> {
   return directories;
 }
 
-export async function getPostIndex(): Promise<PostIndex> {
+export const getPostIndex = cache(async function getPostIndex(): Promise<PostIndex> {
   const directories = await readDirectory([]);
 
   const [rootDirectory, ...rest] = directories;
@@ -89,4 +92,4 @@ export async function getPostIndex(): Promise<PostIndex> {
     directories: sortedDirectories,
     rootPosts,
   };
-}
+});

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { readFile } from "fs/promises";
 import { join, normalize, sep } from "path";
 

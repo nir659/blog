@@ -8,9 +8,10 @@ Minimal Blog is a dark, editorial-style landing page for Markdown content. It sh
 - Markdown-first publishing flow with nested directories under `app/posts`.
 - Interactive reader that streams Markdown over `/api/posts/[...slug]` and renders with GitHub-flavored Markdown.
 - Responsive split layout with sticky archive navigation and a customizable hero section.
+- Next.js 16 Cache Components enabled for faster builds and partial prerendering support.
 
 ## Tech Stack
-- Next.js 16 (App Router) with TypeScript.
+- Next.js 16 (App Router + Cache Components) with TypeScript.
 - React 19 client components for interactive sections.
 - Tailwind CSS v4 (via `@tailwindcss/postcss`) for design tokens and utility classes.
 - React Markdown + `remark-gfm` for content rendering.
@@ -51,6 +52,9 @@ Visit `http://localhost:3000` to explore the blog.
 ## Screenshots
 - Homepage preview: `public/screenshots/home.png`
   - Update this file with a fresh capture after visual changes to keep the README accurate.
+
+## Continuous Integration
+- GitHub Actions workflow `.github/workflows/ci.yml` installs dependencies with `pnpm`, then runs `pnpm lint` and `pnpm build` on pushes to `main` and `dev` as well as on pull requests.
 
 ## Contributing
 Contributions are welcome! Start with `CONTRIBUTING.md` for branch strategy, coding conventions, and review expectations. Open a discussion or issue if you want to propose a larger change before diving into a pull request.
