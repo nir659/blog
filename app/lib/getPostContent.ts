@@ -3,6 +3,10 @@ import "server-only";
 import { readFile } from "fs/promises";
 import { join, normalize, sep } from "path";
 
+function isValidSegment(segment: string): boolean {
+  return /^[a-z0-9.-]+$/i.test(segment) && !segment.startsWith('.') && !segment.endsWith('.');
+}
+
 // reads markdown file from app/posts/ directory
 export async function getPostContent(slug: string | string[]): Promise<string | null> {
   try {
@@ -12,9 +16,14 @@ export async function getPostContent(slug: string | string[]): Promise<string | 
     const slugSegments = Array.isArray(slug) ? slug : slug.split("/");
 
     const safeSegments = slugSegments
-      .map((segment) => segment.trim())
+      .map((segment) => decodeURIComponent(segment).trim())
       .filter(Boolean)
-      .filter((segment) => !segment.includes("..") && !segment.includes("\\"));
+      .filter((segment) => !segment.includes("..") && !segment.includes("\\"))
+      .filter(isValidSegment);
+
+    if (safeSegments.length !== slugSegments.length) {
+      return null;
+    }
 
     if (safeSegments.length === 0) {
       return null;

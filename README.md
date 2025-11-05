@@ -9,6 +9,7 @@ Minimal Blog is a dark, editorial-style landing page for Markdown content. It sh
 - Interactive reader that streams Markdown over `/api/posts/[...slug]` and renders with GitHub-flavored Markdown.
 - Responsive split layout with sticky archive navigation and a customizable hero section.
 - Next.js 16 Cache Components enabled for faster builds and partial prerendering support.
+- Hardened security headers (CSP, frame guards) and long-lived static asset caching baked in.
 
 ## Tech Stack
 - Next.js 16 (App Router + Cache Components) with TypeScript.
@@ -43,6 +44,12 @@ Visit `http://localhost:3000` to explore the blog.
 3. Deploy the `.next` output to your platform of choice:
    - **Vercel**: connect the repository; set the build command to `pnpm build` and output directory to `.next`.
    - **Self-hosted Node**: run `pnpm start` behind your process manager of choice after building.
+
+## Security & SEO
+- Strict slug validation avoids path traversal and invalid characters for Markdown fetches.
+- Content Security Policy, Referrer Policy, and other defensive headers are set via `next.config.ts`.
+- Static assets ship with immutable caching headers; Markdown API responses include long-lived cache control.
+- `app/page.tsx` is statically generated to improve load times and indexing, and metadata includes Open Graph/Twitter tags for richer previews.
 
 ## Managing Content
 - Write posts in Markdown (`.md`) inside `app/posts`. Subdirectories nest neatly into the archive and drive URL slugs.

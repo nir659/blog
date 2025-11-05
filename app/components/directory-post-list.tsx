@@ -29,7 +29,7 @@ export function DirectoryPostList({ directories, rootPosts, onPostSelect }: Dire
   };
 
   const containerClass = rootPosts.length > 0 && directories.length > 0
-    ? "pt-4 mt-4"
+    ? ""
     : rootPosts.length > 0 ? "pt-2" : "";
 
   return (

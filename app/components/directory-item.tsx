@@ -53,7 +53,7 @@ function DocumentIcon() {
   );
 }
 
-// unified component that renders either a directory folder or a post item
+// unified component that renders either a directory folder or item
 export function DirectoryItem(props: DirectoryItemProps) {
   if (props.type === "directory") {
     const { directory, isOpen, onToggle, onPostSelect } = props;
