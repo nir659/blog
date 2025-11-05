@@ -8,11 +8,13 @@ type BlogPostDisplayProps = {
   selectedPostSlug: string | null;
 };
 
+// renders markdown post content or loading/error states
 export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // fetches markdown content when post slug changes
   useEffect(() => {
     if (!selectedPostSlug) {
       return;
@@ -25,7 +27,6 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
     setError(null);
     setContent(null);
 
-    // Fetch markdown content
     fetch(`/api/posts/${selectedPostSlug}`)
       .then((res) => {
         if (!res.ok) {
@@ -52,7 +53,7 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
   }, [selectedPostSlug]);
 
   return (
-    <div className="h-full overflow-y-auto">
+    <>
       {!selectedPostSlug ? (
         <div className="flex items-center justify-center py-20 opacity-50">
           <p className="text-[0.95rem]">Select a post from the directory</p>
@@ -137,7 +138,7 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
         </ReactMarkdown>
       </article>
       )}
-    </div>
+    </>
   );
 }
 

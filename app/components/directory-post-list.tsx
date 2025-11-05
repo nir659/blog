@@ -10,6 +10,7 @@ type DirectoryPostListProps = {
   onPostSelect?: (slug: string) => void;
 };
 
+// renders expandable directory folders grouped by category
 export function DirectoryPostList({ posts, onPostSelect }: DirectoryPostListProps) {
   const [openCategory, setOpenCategory] = useState<string | null>(null);
 
@@ -20,6 +21,7 @@ export function DirectoryPostList({ posts, onPostSelect }: DirectoryPostListProp
   const groupedPosts = groupPostsByCategory(posts);
   const categories = Object.keys(groupedPosts);
 
+  // accordion behavior: only one category open at a time
   const handleToggle = (category: string) => {
     setOpenCategory((prev) => (prev === category ? null : category));
   };

@@ -11,8 +11,6 @@ html,
 body {
   padding: 0;
   margin: 0;
-  height: 100vh;
-  overflow: hidden;
 }
 
 @theme inline {
@@ -43,4 +41,28 @@ body {
 
 a {
   color: inherit;
+}
+
+/* custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grid-lines);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--grid-lines) transparent;
 }

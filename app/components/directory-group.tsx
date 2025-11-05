@@ -28,6 +28,7 @@ function FolderClosedIcon() {
   );
 }
 
+// renders single category folder with expandable post list
 export function DirectoryGroup({
   category,
   posts,
@@ -40,7 +41,7 @@ export function DirectoryGroup({
     .replace(/\s+/g, "-")}`;
 
   return (
-    <div className="border-b border-[var(--grid-lines)]">
+    <div>
       <button
         onClick={onToggle}
         aria-expanded={isOpen}

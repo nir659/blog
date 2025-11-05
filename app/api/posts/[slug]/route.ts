@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPostContent } from "@/app/lib/getPostContent";
 
+// api route to serve markdown post content
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }

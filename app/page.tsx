@@ -40,19 +40,20 @@ const posts = [
   },
 ];
 
+// manages selected post state and renders layout
 export default function HomePage() {
   const [selectedPostSlug, setSelectedPostSlug] = useState<string | null>(null);
 
+  // updates selected post when user clicks from directory
   const handlePostSelect = (slug: string) => {
     setSelectedPostSlug(slug);
   };
 
   return (
     <main
-      className={`${spaceMono.className} flex min-h-screen justify-center px-4 sm:px-6 md:h-screen md:overflow-y-hidden md:overflow-x-visible`}
+      className={`${spaceMono.className} flex min-h-screen justify-center px-4 sm:px-6 md:overflow-x-visible`}
     >
-      <div className="grid w-full max-w-[1900px] grid-cols-1 md:h-full md:grid-cols-[minmax(250px,300px)_1px_minmax(0,1100px)_1px_minmax(3rem,1fr)] md:gap-x-[clamp(2rem,6vw,4rem)]">
-        {/* Left column */}
+      <div className="grid w-full max-w-[1900px] grid-cols-1 md:grid-cols-[minmax(250px,300px)_1px_minmax(0,1100px)_1px_minmax(3rem,1fr)] md:gap-x-[clamp(2rem,6vw,4rem)]">
         <aside className="col-start-1 py-[clamp(3rem,8vw,2rem)] md:sticky md:top-0 md:h-screen md:overflow-y-auto">
           <DirectoryPostList posts={posts} onPostSelect={handlePostSelect} />
         </aside>
@@ -62,14 +63,9 @@ export default function HomePage() {
           className="hidden self-stretch bg-[var(--grid-lines)] md:col-start-2 md:block"
         />
 
-        {/* Right column */}
-        <section className="col-start-1 flex flex-col gap-[clamp(2rem,6vw,3.5rem)] py-[clamp(3rem,8vw,2rem)] md:col-start-3 md:h-full">
-          <div className="flex-none">
-            <Main navLinks={navLinks} />
-          </div>
-          <div className="min-h-0 flex-1 overflow-y-auto pr-3 md:pr-6">
-            <BlogPostDisplay selectedPostSlug={selectedPostSlug} />
-          </div>
+        <section className="col-start-1 flex flex-col gap-[clamp(2rem,6vw,3.5rem)] py-[clamp(3rem,8vw,2rem)] md:col-start-3">
+          <Main navLinks={navLinks} />
+          <BlogPostDisplay selectedPostSlug={selectedPostSlug} />
         </section>
 
         <span

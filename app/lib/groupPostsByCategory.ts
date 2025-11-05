@@ -1,5 +1,6 @@
 import type { PostSummary, GroupedPosts } from "@/app/components/post-list";
 
+// groups posts by category and sorts categories alphabetically
 export function groupPostsByCategory(posts: PostSummary[]): GroupedPosts {
   const grouped: GroupedPosts = {};
 
