@@ -1,44 +1,66 @@
 "use client";
 
-import { useState } from "react";
-import type { PostSummary } from "./post-list";
-import { groupPostsByCategory } from "@/app/lib/groupPostsByCategory";
-import { DirectoryGroup } from "./directory-group";
+import { useMemo, useState } from "react";
+import type { DirectoryMeta, PostMeta } from "@/app/lib/posts";
+import { DirectoryItem } from "./directory-item";
 
 type DirectoryPostListProps = {
-  posts: PostSummary[];
+  directories: DirectoryMeta[];
+  rootPosts: PostMeta[];
   onPostSelect?: (slug: string) => void;
 };
 
-// renders expandable directory folders grouped by category
-export function DirectoryPostList({ posts, onPostSelect }: DirectoryPostListProps) {
-  const [openCategory, setOpenCategory] = useState<string | null>(null);
+// renders expandable directory folders, including empty directories
+export function DirectoryPostList({ directories, rootPosts, onPostSelect }: DirectoryPostListProps) {
+  const directoryKeys = useMemo(
+    () => directories.map((directory) => directory.path),
+    [directories]
+  );
+  const [openDirectory, setOpenDirectory] = useState<string | null>(
+    directoryKeys[0] ?? null
+  );
 
-  if (posts.length === 0) {
+  if (directories.length === 0 && rootPosts.length === 0) {
     return null;
   }
 
-  const groupedPosts = groupPostsByCategory(posts);
-  const categories = Object.keys(groupedPosts);
-
-  // accordion behavior: only one category open at a time
-  const handleToggle = (category: string) => {
-    setOpenCategory((prev) => (prev === category ? null : category));
+  const handleToggle = (key: string) => {
+    setOpenDirectory((previous) => (previous === key ? null : key));
   };
+
+  const containerClass = rootPosts.length > 0 && directories.length > 0
+    ? "pt-4 mt-4"
+    : rootPosts.length > 0 ? "pt-2" : "";
 
   return (
     <section id="archive" className="flex flex-col">
-      {categories.map((category) => (
-        <DirectoryGroup
-          key={category}
-          category={category}
-          posts={groupedPosts[category]}
-          isOpen={openCategory === category}
-          onToggle={() => handleToggle(category)}
-          onPostSelect={onPostSelect}
-        />
-      ))}
+      {directories.map((directory) => {
+        const key = directory.path;
+        return (
+          <DirectoryItem
+            key={key}
+            type="directory"
+            directory={directory}
+            isOpen={openDirectory === key}
+            onToggle={() => handleToggle(key)}
+            onPostSelect={onPostSelect}
+          />
+        );
+      })}
+      {rootPosts.length > 0 && (
+        <div className={containerClass}>
+          <ul className="flex flex-col">
+            {rootPosts.map((post) => (
+              <DirectoryItem
+                key={post.slug}
+                type="post"
+                post={post}
+                onPostSelect={onPostSelect}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }
-

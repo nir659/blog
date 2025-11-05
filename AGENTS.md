@@ -3,20 +3,19 @@
 ## Application Overview
 - Terminal-inspired blog landing page built on the Next.js 16 App Router with React 19 Client Components.
 - Left column lists posts in collapsible directory groups; right column renders Markdown content chosen by the reader.
-- Markdown files in `app/posts/` are served as plain text through `app/api/posts/[slug]/route.ts` and rendered with `react-markdown` plus `remark-gfm`.
+- Markdown files in `app/posts/` (including nested directories) are served as plain text through `app/api/posts/[...slug]/route.ts` and rendered with `react-markdown` plus `remark-gfm`.
 - Tailwind CSS 4 powers the monospace layout; `app/globals.css` defines theme tokens such as `--grid-lines`.
 
 ## Project Structure & Module Organization
-- `app/page.tsx` drives the landing experience, including the static `posts` directory listing until a CMS is introduced.
+- `app/page.tsx` drives the landing experience and pulls the filesystem-backed post index before hydrating the client shell.
 - Shared UI lives in `app/components/`; keep file names kebab-case and exports PascalCase (e.g., `directory-post-list.tsx` → `DirectoryPostList`).
-- Utility helpers live in `app/lib/`, like Markdown loaders and post-grouping functions.
-- Markdown sources stay under `app/posts/`; slugs must match the file name (e.g., `my-post.md` → slug `my-post`).
+- Utility helpers live in `app/lib/`, like Markdown loaders and directory scanners.
+- Markdown sources stay under `app/posts/`; slugs mirror the relative file path (e.g., `ctf/my-post.md` → slug `ctf/my-post`).
 - Tailwind styles load from `app/globals.css`; extend design tokens in `:root` before creating new CSS files.
 - Static assets live in `public/`; tweak behavior via `next.config.ts`, `eslint.config.mjs`, and `postcss.config.mjs`.
 
 ## Content Authoring Workflow
-- Add new content as Markdown files in `app/posts/` and keep filenames kebab-case.
-- Register each post in the `posts` array inside `app/page.tsx` with `category`, `title`, `slug`, and optional `date` so it appears in the directory.
+- Add new content as Markdown files in `app/posts/` and keep filenames kebab-case. Use subdirectories (e.g. `app/posts/ctf/`) to group posts; root-level `.md` files appear beneath the folders in the directory UI.
 - Prefer GitHub-flavored Markdown; code fences render automatically with the existing renderer.
 
 ## Build, Test, and Development Commands
