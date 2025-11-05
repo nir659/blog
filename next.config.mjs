@@ -1,5 +1,3 @@
-import type { NextConfig } from "next";
-
 const ContentSecurityPolicy = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -46,7 +44,8 @@ const staticAssetCaching = [
   },
 ];
 
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   cacheComponents: true,
   async headers() {
     return [

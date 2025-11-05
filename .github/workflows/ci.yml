@@ -9,46 +9,34 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  DOCKER_BUILDKIT: 1
+
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-          cache-dependency-path: '**/pnpm-lock.yaml'
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Run lint
-        run: pnpm lint
+      - name: Build lint stage
+        run: docker build --target lint --file Dockerfile .
 
-  build:
+  test:
     runs-on: ubuntu-latest
+    needs: lint
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-          cache-dependency-path: '**/pnpm-lock.yaml'
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build project
-        run: pnpm build
+      - name: Build test stage
+        run: docker build --target test --file Dockerfile .
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production image
+        run: docker build --file Dockerfile --tag blog:ci .
 
 permissions:
   contents: read

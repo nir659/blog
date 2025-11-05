@@ -19,7 +19,7 @@ export function SiteFooter() {
           <li>
             <a
               className="underline decoration-[1px] underline-offset-2"
-              href="https://t.me/nir659"
+              href="https://t.me/"
             >
               Telegram
             </a>
@@ -27,7 +27,7 @@ export function SiteFooter() {
           <li>
             <a 
               className="underline decoration-[1px] underline-offset-2"
-              href="https://discord.gg/nir659"
+              href="https://discord.com/users/832277464415338566"
             >
               Discord
             </a>

@@ -37,6 +37,7 @@ Visit `http://localhost:3000` to explore the blog.
 - `pnpm build` — create a production bundle.
 - `pnpm start` — run the production build locally.
 - `pnpm lint` — run the Next.js ESLint ruleset.
+- `pnpm test` — execute the Vitest suite against the Markdown indexing utilities.
 
 ## Deployment
 1. Ensure environment variables are configured if you add any (none are required by default).
@@ -47,7 +48,7 @@ Visit `http://localhost:3000` to explore the blog.
 
 ## Security & SEO
 - Strict slug validation avoids path traversal and invalid characters for Markdown fetches.
-- Content Security Policy, Referrer Policy, and other defensive headers are set via `next.config.ts`.
+- Content Security Policy, Referrer Policy, and other defensive headers are set via `next.config.mjs`.
 - Static assets ship with immutable caching headers; Markdown API responses include long-lived cache control.
 - `app/page.tsx` is statically generated to improve load times and indexing, and metadata includes Open Graph/Twitter tags for richer previews.
 
@@ -61,7 +62,7 @@ Visit `http://localhost:3000` to explore the blog.
   - Update this file with a fresh capture after visual changes to keep the README accurate.
 
 ## Continuous Integration
-- GitHub Actions workflow `.github/workflows/ci.yml` installs dependencies with `pnpm`, then runs `pnpm lint` and `pnpm build` on pushes to `main` and `dev` as well as on pull requests.
+- GitHub Actions workflow `.github/workflows/ci.yml` builds the Docker `lint` and `test` stages before baking the production image, keeping parity with the container used in deployment.
 
 ## Contributing
 Contributions are welcome! Start with `CONTRIBUTING.md` for branch strategy, coding conventions, and review expectations. Open a discussion or issue if you want to propose a larger change before diving into a pull request.

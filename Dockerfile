@@ -1,0 +1,63 @@
+# syntax=docker/dockerfile:1.7
+
+FROM node:20-bookworm-slim AS base
+
+ENV PNPM_HOME="/usr/local/share/pnpm" \
+    PATH="$PNPM_HOME:$PATH" \
+    NEXT_TELEMETRY_DISABLED=1
+
+RUN corepack enable
+
+WORKDIR /app
+
+FROM base AS deps
+
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install --frozen-lockfile
+
+FROM deps AS lint
+
+COPY . .
+
+RUN pnpm lint
+
+FROM deps AS test
+
+ENV NODE_ENV=test
+
+COPY . .
+
+RUN pnpm test
+
+FROM deps AS builder
+
+ENV NODE_ENV=production
+
+COPY . .
+
+RUN pnpm build
+
+FROM base AS runner
+
+ENV NODE_ENV=production \
+    PORT=3000
+
+RUN mkdir -p /app && chown node:node /app
+
+USER node
+
+WORKDIR /app
+
+COPY --chown=node:node package.json pnpm-lock.yaml ./
+
+RUN pnpm install --frozen-lockfile --prod
+
+COPY --from=builder --chown=node:node /app/.next ./.next
+COPY --from=builder --chown=node:node /app/public ./public
+COPY --from=builder --chown=node:node /app/next.config.mjs ./next.config.mjs
+COPY --from=builder --chown=node:node /app/app/posts ./app/posts
+
+EXPOSE 3000
+
+CMD ["pnpm", "start"]
