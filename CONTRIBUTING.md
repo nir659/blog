@@ -12,17 +12,18 @@
 - Utility helpers live in `app/lib/`, like Markdown loaders and directory scanners.
 - Markdown sources stay under `app/posts/`; slugs mirror the relative file path (e.g., `ctf/my-post.md` → slug `ctf/my-post`).
 - Tailwind styles load from `app/globals.css`; extend design tokens in `:root` before creating new CSS files.
-- Static assets live in `public/`; tweak behavior via `next.config.ts`, `eslint.config.mjs`, and `postcss.config.mjs`.
+- Static assets live in `public/`; tweak behavior via `next.config.mjs`, `eslint.config.mjs`, and `postcss.config.mjs`.
 
 ## Content Authoring Workflow
 - Add new content as Markdown files in `app/posts/` and keep filenames kebab-case. Use subdirectories (e.g. `app/posts/ctf/`) to group posts; root-level `.md` files appear beneath the folders in the directory UI.
 - Prefer GitHub-flavored Markdown; code fences render automatically with the existing renderer.
 
 ## Build, Test, and Development Commands
-- `npm run dev` — start the Next.js dev server at `http://localhost:3000` with hot reload.
-- `npm run build` — generate the production bundle; use before shipping changes that touch routing or config.
-- `npm run start` — run the production build locally; useful for validating SSR behavior.
-- `npm run lint` — run ESLint with the Next.js Core Web Vitals ruleset; fix lint issues before opening a PR.
+- `pnpm dev` — start the Next.js dev server at `http://localhost:3000` with hot reload.
+- `pnpm build` — generate the production bundle; use before shipping changes that touch routing or config.
+- `pnpm start` — run the production build locally; useful for validating SSR behavior.
+- `pnpm lint` — run ESLint with the Next.js Core Web Vitals ruleset; fix lint issues before opening a PR.
+- `pnpm test` — execute the Vitest suite (see `tests/` for examples).
 
 ## Coding Style & Naming Conventions
 - Default to TypeScript (`.tsx` for React, `.ts` for helpers); type props explicitly.
@@ -32,10 +33,10 @@
 - Cluster Tailwind classes by layout → spacing → typography and reach for `clsx` once a list grows long.
 
 ## Testing Guidelines
-- No automated suite ships yet, so pair any feature with tests in the same PR.
-- Favor Vitest + React Testing Library placed in `__tests__/` folders next to the code under test.
+- Unit tests live under `tests/` and run with Vitest; mirror the folder structure of the code under test for clarity.
+- Add fixtures or mocks (see `tests/mocks/`) to isolate filesystem and Next.js-specific concerns.
 - Use snapshots sparingly for layout atoms and cover flows like rendering the latest posts with integration tests.
-- Capture manual QA steps in the PR until CI is wired up.
+- Document any manual QA steps in the PR when changes impact UI or runtime configuration.
 
 ## Commit & Pull Request Guidelines
 - History only shows the Create Next App scaffold; adopt Conventional Commits (`feat:`, `fix:`, `chore:`) going forward.

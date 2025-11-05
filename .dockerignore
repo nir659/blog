@@ -1,0 +1,14 @@
+.git
+.github
+node_modules
+.pnpm-store
+.next
+out
+dist
+npm-debug.log
+yarn-error.log
+Dockerfile*
+docker-compose.yml
+.env
+.env.*
+.DS_Store
