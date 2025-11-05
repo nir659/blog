@@ -19,7 +19,7 @@ Minimal Blog is a dark, editorial-style landing page for Markdown content. It sh
 ## Getting Started
 ### Prerequisites
 - Node.js 18.18+ or 20.x.
-- `pnpm` 8+ (or swap commands with `npm`/`yarn` if you prefer).
+- `pnpm` 9+ (or swap commands with `npm`/`yarn` if you prefer).
 
 ### Installation
 ```bash
