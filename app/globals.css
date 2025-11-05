@@ -2,9 +2,9 @@
 
 :root {
   color-scheme: dark;
-  --background: #050607;
+  --background: #0b0b0b;
   --foreground: #ffffff;
-  --grid-lines: rgb(255, 255, 255, 0.25);
+  --grid-lines: rgb(35, 35, 35);
 }
 
 html,
@@ -22,7 +22,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #050607;
+    --background: #0b0b0b;
     --foreground: #ffffff;
   }
 }
@@ -41,4 +41,28 @@ body {
 
 a {
   color: inherit;
+}
+
+/* custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--grid-lines);
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--grid-lines) transparent;
 }
