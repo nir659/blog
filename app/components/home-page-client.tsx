@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { DirectoryMeta, PostMeta } from "@/app/lib/posts";
 import { DirectoryPostList } from "./directory-post-list";
 import { BlogPostDisplay } from "./blog-post-display";
@@ -31,6 +31,11 @@ export function HomePageClient({
   const [selectedPostSlug, setSelectedPostSlug] = useState<string | null>(
     initialSelectedSlug
   );
+
+  // Sync with prop changes after revalidation
+  useEffect(() => {
+    setSelectedPostSlug(initialSelectedSlug);
+  }, [initialSelectedSlug]);
 
   return (
     <main

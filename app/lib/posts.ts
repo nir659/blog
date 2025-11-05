@@ -43,7 +43,17 @@ function directoryLabel(pathSegments: string[]): string {
 
 async function readDirectory(pathSegments: string[]): Promise<DirectoryMeta[]> {
   const directoryPath = join(POSTS_DIRECTORY, ...pathSegments);
-  const entries = await readdir(directoryPath, { withFileTypes: true });
+  
+  let entries;
+  try {
+    entries = await readdir(directoryPath, { withFileTypes: true });
+  } catch (error) {
+    // Directory doesn't exist or can't be read - return empty
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
 
   const files = entries
     .filter((entry) => entry.isFile() && entry.name.endsWith(MD_EXTENSION))
