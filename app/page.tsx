@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Space_Mono } from "next/font/google";
 import { HomePageClient } from "@/app/components/home-page-client";
 import { getPostIndex } from "@/app/lib/posts";
@@ -14,7 +15,7 @@ const navLinks = [
   { href: "#contact", label: "Contact" },
 ];
 
-export default async function HomePage() {
+async function HomePageContent() {
   const { directories, rootPosts } = await getPostIndex();
   const allPosts = [
     ...rootPosts,
@@ -38,5 +39,19 @@ export default async function HomePage() {
       fontClassName={spaceMono.className}
       initialSelectedSlug={initialSelectedSlug}
     />
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <p className="text-[0.95rem] opacity-50">Loading...</p>
+        </div>
+      }
+    >
+      <HomePageContent />
+    </Suspense>
   );
 }
