@@ -11,6 +11,8 @@ export function SiteFooter() {
             <a
               className="underline decoration-[1px] underline-offset-2"
               href="https://github.com/nir659/blog"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Source Code
             </a>
@@ -19,6 +21,8 @@ export function SiteFooter() {
             <a
               className="underline decoration-[1px] underline-offset-2"
               href="https://t.me/"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Telegram
             </a>
@@ -27,6 +31,8 @@ export function SiteFooter() {
             <a 
               className="underline decoration-[1px] underline-offset-2"
               href="https://discord.com/users/832277464415338566"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               Discord
             </a>

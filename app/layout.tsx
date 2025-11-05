@@ -20,15 +20,18 @@ export const metadata: Metadata = {
     default: "Minimal Blog",
     template: "%s | Minimal Blog",
   },
-  description: "Minimal Blog is a dark, editorial-style landing page for Markdown content built with Next.js 16.",
+  description: "NIR is a dark, minimal-style blog for Markdown content.",
   keywords: [
     "Minimal Blog",
-    "Next.js 16",
     "Markdown blog",
     "Static site",
   ],
   alternates: {
     canonical: "/",
+  },
+  icons: {
+    icon: "/1735490735511.ico",
+    shortcut: "/1735490735511.ico",
   },
   openGraph: {
     title: "Minimal Blog",

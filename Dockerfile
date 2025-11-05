@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
-FROM node:20-bookworm-slim AS base
+FROM node:20-bookworm-slim AS deps
 
 ENV PNPM_HOME="/usr/local/share/pnpm" \
     PATH="$PNPM_HOME:$PATH" \
@@ -10,25 +10,9 @@ RUN corepack enable
 
 WORKDIR /app
 
-FROM base AS deps
-
 COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile
-
-FROM deps AS lint
-
-COPY . .
-
-RUN pnpm lint
-
-FROM deps AS test
-
-ENV NODE_ENV=test
-
-COPY . .
-
-RUN pnpm test
 
 FROM deps AS builder
 
@@ -38,10 +22,16 @@ COPY . .
 
 RUN pnpm build
 
-FROM base AS runner
+FROM node:20-bookworm-slim AS runner
+
+ENV PNPM_HOME="/usr/local/share/pnpm" \
+    PATH="$PNPM_HOME:$PATH" \
+    NEXT_TELEMETRY_DISABLED=1
 
 ENV NODE_ENV=production \
     PORT=3000
+
+RUN corepack enable
 
 RUN mkdir -p /app /app/posts && chown -R node:node /app
 
