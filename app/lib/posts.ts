@@ -1,8 +1,7 @@
 import "server-only";
 
 import { readdir } from "fs/promises";
-import { cache } from "react";
-import { join } from "path";
+import { join, resolve } from "path";
 
 export type PostMeta = {
   directory: string;
@@ -21,7 +20,9 @@ export type PostIndex = {
   rootPosts: PostMeta[];
 };
 
-const POSTS_DIRECTORY = join(process.cwd(), "app", "posts");
+const POSTS_DIRECTORY = process.env.POSTS_DIRECTORY
+  ? resolve(process.env.POSTS_DIRECTORY)
+  : join(process.cwd(), "app", "posts");
 const MD_EXTENSION = ".md";
 
 function formatTitleFromSlug(slug: string): string {
@@ -43,7 +44,23 @@ function directoryLabel(pathSegments: string[]): string {
 
 async function readDirectory(pathSegments: string[]): Promise<DirectoryMeta[]> {
   const directoryPath = join(POSTS_DIRECTORY, ...pathSegments);
-  const entries = await readdir(directoryPath, { withFileTypes: true });
+
+  let entries;
+  try {
+    entries = await readdir(directoryPath, { withFileTypes: true });
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === "ENOENT") {
+      return [
+        {
+          path: pathSegments.join("/"),
+          label: directoryLabel(pathSegments),
+          posts: [],
+        },
+      ];
+    }
+    throw error;
+  }
 
   const files = entries
     .filter((entry) => entry.isFile() && entry.name.endsWith(MD_EXTENSION))
@@ -79,7 +96,7 @@ async function readDirectory(pathSegments: string[]): Promise<DirectoryMeta[]> {
   return directories;
 }
 
-export const getPostIndex = cache(async function getPostIndex(): Promise<PostIndex> {
+export async function getPostIndex(): Promise<PostIndex> {
   const directories = await readDirectory([]);
 
   const [rootDirectory, ...rest] = directories;
@@ -92,4 +109,4 @@ export const getPostIndex = cache(async function getPostIndex(): Promise<PostInd
     directories: sortedDirectories,
     rootPosts,
   };
-});
+}

@@ -48,3 +48,4 @@
 ## Environment & Configuration Tips
 - Store secrets in `.env.local` and document keys in the PR when they change.
 - Note asset sources (fonts, images) in the PR and prefer CDN links over binary commits.
+- When running in Docker, bind-mount `./app/posts` (e.g. `./app/posts:/app/posts:ro,Z`) and set `POSTS_DIRECTORY=/app/posts` so Markdown changes propagate without rebuilding the image. The `:Z` flag fixes SELinux permission issues on host mounts.

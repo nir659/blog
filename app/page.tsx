@@ -15,6 +15,9 @@ const navLinks = [
   { href: "#contact", label: "Contact" },
 ];
 
+// Force dynamic rendering for fresh post data
+export const revalidate = 0;
+
 async function HomePageContent() {
   const { directories, rootPosts } = await getPostIndex();
   const allPosts = [

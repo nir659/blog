@@ -7,4 +7,7 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
+      - POSTS_DIRECTORY=/app/posts
+    volumes:
+      - ./app/posts:/app/posts:Z
     restart: unless-stopped

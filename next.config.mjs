@@ -46,7 +46,6 @@ const staticAssetCaching = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  cacheComponents: true,
   async headers() {
     return [
       {

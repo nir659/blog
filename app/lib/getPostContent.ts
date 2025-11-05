@@ -1,7 +1,7 @@
 import "server-only";
 
 import { readFile } from "fs/promises";
-import { join, normalize, sep } from "path";
+import { join, normalize, resolve, sep } from "path";
 
 function isValidSegment(segment: string): boolean {
   return /^[a-z0-9.-]+$/i.test(segment) && !segment.startsWith('.') && !segment.endsWith('.');
@@ -10,7 +10,9 @@ function isValidSegment(segment: string): boolean {
 // reads markdown file from app/posts/ directory
 export async function getPostContent(slug: string | string[]): Promise<string | null> {
   try {
-    const postsDirectory = join(process.cwd(), "app", "posts");
+    const postsDirectory = process.env.POSTS_DIRECTORY
+      ? resolve(process.env.POSTS_DIRECTORY)
+      : join(process.cwd(), "app", "posts");
     const normalizedPostsDirectory = normalize(postsDirectory + sep);
 
     const slugSegments = Array.isArray(slug) ? slug : slug.split("/");

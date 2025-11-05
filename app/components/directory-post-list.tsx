@@ -19,6 +19,10 @@ export function DirectoryPostList({ directories, rootPosts, onPostSelect }: Dire
   const [openDirectory, setOpenDirectory] = useState<string | null>(
     directoryKeys[0] ?? null
   );
+  const activeDirectory =
+    openDirectory && directoryKeys.includes(openDirectory)
+      ? openDirectory
+      : directoryKeys[0] ?? null;
 
   if (directories.length === 0 && rootPosts.length === 0) {
     return null;
@@ -41,7 +45,7 @@ export function DirectoryPostList({ directories, rootPosts, onPostSelect }: Dire
             key={key}
             type="directory"
             directory={directory}
-            isOpen={openDirectory === key}
+            isOpen={activeDirectory === key}
             onToggle={() => handleToggle(key)}
             onPostSelect={onPostSelect}
           />

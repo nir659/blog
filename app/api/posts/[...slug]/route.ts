@@ -4,12 +4,12 @@ import { getPostContent } from "@/app/lib/getPostContent";
 // api route to serve markdown post content from nested directories
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ slug?: string[] }> }
+  { params }: { params: Promise<{ slug: string[] }> }
 ) {
   const { slug } = await params;
   const slugSegments = Array.isArray(slug) ? slug : [];
 
-  if (!slugSegments || slugSegments.length === 0) {
+  if (slugSegments.length === 0) {
     return NextResponse.json({ error: "Slug is required" }, { status: 400 });
   }
 
@@ -22,7 +22,7 @@ export async function GET(
   return new NextResponse(content, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, max-age=86400, immutable",
+      "Cache-Control": "no-store",
     },
   });
 }

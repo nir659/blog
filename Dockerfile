@@ -43,7 +43,7 @@ FROM base AS runner
 ENV NODE_ENV=production \
     PORT=3000
 
-RUN mkdir -p /app && chown node:node /app
+RUN mkdir -p /app /app/posts && chown -R node:node /app
 
 USER node
 

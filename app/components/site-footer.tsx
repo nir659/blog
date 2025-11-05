@@ -1,11 +1,10 @@
 export function SiteFooter() {
   return (
     <footer
-      className="fixed bottom-0 right-0 flex flex-col text-[1.1rem] leading-[2.2] opacity-75 m-6 pl-6"
+      className="fixed bottom-0 right-0 flex flex-col text-[1.1rem] leading-[2.2] opacity-75 m-6 pl-6 text-right"
       id="contact"
-      dir="rtl"
     >
-      <div className="max-w-auto text-right">
+      <div className="max-w-auto">
         <p className="text-[0.85rem] uppercase tracking-[0.18em] opacity-80">Links</p>
         <ul className="flex flex-col gap-1 mt-2 max-w-auto">
           <li>
