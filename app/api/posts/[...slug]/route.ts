@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { unstable_noStore as noStore } from "next/cache";
 import { getPostContent } from "@/app/lib/getPostContent";
 
 // api route to serve markdown post content from nested directories
@@ -6,6 +7,8 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string[] }> }
 ) {
+  noStore();
+
   const { slug } = await params;
   const slugSegments = Array.isArray(slug) ? slug : [];
 

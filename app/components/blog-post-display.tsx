@@ -86,7 +86,7 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
 
     fetch(`/api/posts/${selectedPostSlug}`, {
       signal: abortController.signal,
-      next: { revalidate: 3600 },
+      cache: "no-store",
     })
       .then((res) => {
         if (!res.ok) {
