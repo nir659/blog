@@ -14,6 +14,14 @@ COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile
 
+FROM deps AS lint
+
+WORKDIR /app
+
+COPY . .
+
+RUN pnpm lint
+
 FROM deps AS builder
 
 ENV NODE_ENV=production
