@@ -32,16 +32,17 @@ export function HomePageClient({
     initialSelectedSlug
   );
 
-  // Sync with prop changes after revalidation
   useEffect(() => {
     setSelectedPostSlug(initialSelectedSlug);
   }, [initialSelectedSlug]);
+
+  const gridClassName = "grid w-full max-w-[1900px] grid-cols-1 md:grid-cols-[minmax(150px,200px)_1px_minmax(0,1100px)_1px_minmax(3rem,1fr)] md:gap-x-[clamp(2rem,6vw,4rem)]";
 
   return (
     <main
       className={`${fontClassName} flex min-h-screen justify-center px-4 sm:px-6 md:overflow-x-visible`}
     >
-      <div className="grid w-full max-w-[1900px] grid-cols-1 md:grid-cols-[minmax(250px,300px)_1px_minmax(0,1100px)_1px_minmax(3rem,1fr)] md:gap-x-[clamp(2rem,6vw,4rem)]">
+      <div className={gridClassName}>
         <aside className="col-start-1 py-[clamp(3rem,8vw,2rem)] md:sticky md:top-0 md:h-screen md:overflow-y-auto">
           <DirectoryPostList
             directories={directories}

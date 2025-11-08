@@ -39,7 +39,7 @@ export function SiteFooter() {
           </li>
         </ul>
         <p className="text-[0.85rem] uppercase tracking-[0.18em] opacity-80 mt-2">
-          NIR© | {" "}
+          NIR© {new Date().getFullYear()} |{" "}
           <a
             className="underline decoration-[1px] underline-offset-2"
             href="mailto:hello@nir.rip"

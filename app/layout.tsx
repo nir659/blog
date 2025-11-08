@@ -17,14 +17,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Minimal Blog",
-    template: "%s | Minimal Blog",
+    default: "Blog",
+    template: "%s | Blog",
   },
   description: "NIR is a dark, minimal-style blog for Markdown content.",
   keywords: [
-    "Minimal Blog",
-    "Markdown blog",
-    "Static site",
+    "Blog",
+    "NIR",
+    "Personal Blog",
   ],
   alternates: {
     canonical: "/",
@@ -34,23 +34,23 @@ export const metadata: Metadata = {
     shortcut: "/1735490735511.ico",
   },
   openGraph: {
-    title: "Minimal Blog",
+    title: "NIR / Blog",
     description: "Discover long-form Markdown posts rendered with a modern, high-contrast reading experience.",
     url: siteUrl,
-    siteName: "Minimal Blog",
+    siteName: "NIR / Blog",
     images: [
       {
         url: `${siteUrl}/screenshots/home.png`,
         width: 1600,
         height: 900,
-        alt: "Minimal Blog homepage",
+        alt: "blog",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Minimal Blog",
+    title: "NIR / Blog",
     description: "Discover long-form Markdown posts rendered with a modern, high-contrast reading experience.",
     images: [`${siteUrl}/screenshots/home.png`],
   },
