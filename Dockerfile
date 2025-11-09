@@ -22,6 +22,14 @@ COPY . .
 
 RUN pnpm lint
 
+FROM deps AS test
+
+WORKDIR /app
+
+COPY . .
+
+RUN pnpm test
+
 FROM deps AS builder
 
 ENV NODE_ENV=production
