@@ -1,18 +1,21 @@
 "use client";
 
-import type { DirectoryMeta, PostMeta } from "@/app/lib/posts";
+import type { ReactNode } from "react";
+import type { DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 
 type DirectoryItemProps =
   | {
       type: "directory";
-      directory: DirectoryMeta;
+      node: DirectoryTreeNode;
+      depth: number;
       isOpen: boolean;
       onToggle: () => void;
-      onPostSelect?: (slug: string) => void;
+      children?: ReactNode;
     }
   | {
       type: "post";
       post: PostMeta;
+      depth?: number;
       onPostSelect?: (slug: string) => void;
     };
 
@@ -53,50 +56,48 @@ function DocumentIcon() {
   );
 }
 
-// unified component that renders either a directory folder or item
+function directoryContentId(node: DirectoryTreeNode): string {
+  const key = node.path || node.label || "root";
+  const normalized = key.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  return `directory-content-${normalized || "root"}`;
+}
+
+function indentFromDepth(depth: number): string {
+  const base = 0.4;
+  const step = 0.3;
+  return `${base + depth * step}rem`;
+}
+
 export function DirectoryItem(props: DirectoryItemProps) {
   if (props.type === "directory") {
-    const { directory, isOpen, onToggle, onPostSelect } = props;
-    const key = directory.path || directory.label;
-    const contentId = `directory-content-${key
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-") || "root"}`;
+    const { node, depth, isOpen, onToggle, children } = props;
+    const contentId = directoryContentId(node);
+    const buttonPaddingLeft = indentFromDepth(depth);
+    const contentPaddingLeft = indentFromDepth(depth + 1);
 
     return (
       <div>
         <button
+          type="button"
           onClick={onToggle}
           aria-expanded={isOpen}
           aria-controls={contentId}
-          className="flex w-full items-center gap-3 py-3 px-4 text-left transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70 cursor-pointer"
+          className="flex w-full items-center gap-2 py-2 text-left transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70 cursor-pointer"
+          style={{ paddingLeft: buttonPaddingLeft }}
         >
           <FolderClosedIcon />
-          <span className="font-normal">{directory.label}/</span>
+          <span className="font-normal">{node.label}/</span>
         </button>
 
         <div
           id={contentId}
           className={`overflow-hidden transition-all duration-200 ${
-            isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+            isOpen ? "max-h-[1500px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="pl-12 pr-4 pb-4">
-            {directory.posts.length === 0 ? (
+          <div className="pb-1" style={{ paddingLeft: contentPaddingLeft }}>
+            {children ?? (
               <p className="text-[0.85rem] opacity-50">nothing is here</p>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {directory.posts.map((post) => (
-                  <li key={post.slug} className="flex items-center gap-2">
-                    <DocumentIcon />
-                    <button
-                      onClick={() => onPostSelect?.(post.slug)}
-                      className="block w-full text-left text-[0.9rem] transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70 cursor-pointer"
-                    >
-                      {post.title}
-                    </button>
-                  </li>
-                ))}
-              </ul>
             )}
           </div>
         </div>
@@ -104,12 +105,17 @@ export function DirectoryItem(props: DirectoryItemProps) {
     );
   }
 
-  // type === "post"
-  const { post, onPostSelect } = props;
+  const { post, depth = 0, onPostSelect } = props;
+  const paddingLeft = indentFromDepth(depth);
+
   return (
-    <li className="flex items-center gap-3 py-3 px-4">
+    <li
+      className="flex items-center gap-3 py-1 pr-2"
+      style={{ paddingLeft }}
+    >
       <DocumentIcon />
       <button
+        type="button"
         onClick={() => onPostSelect?.(post.slug)}
         className="block w-full text-left text-[0.9rem] transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70 cursor-pointer"
       >
@@ -118,4 +124,3 @@ export function DirectoryItem(props: DirectoryItemProps) {
     </li>
   );
 }
-

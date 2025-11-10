@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { DirectoryMeta, PostMeta } from "@/app/lib/posts";
+import type { DirectoryMeta, DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 import { DirectoryPostList } from "./directory-post-list";
 import { BlogPostDisplay } from "./blog-post-display";
 import { Main } from "./home";
@@ -15,6 +15,7 @@ type NavLink = {
 type HomePageClientProps = {
   directories: DirectoryMeta[];
   rootPosts: PostMeta[];
+  directoryTree: DirectoryTreeNode;
   navLinks: NavLink[];
   fontClassName: string;
   initialSelectedSlug: string | null;
@@ -22,8 +23,8 @@ type HomePageClientProps = {
 
 // client shell responsible for selection state and overall layout chrome
 export function HomePageClient({
-  directories,
   rootPosts,
+  directoryTree,
   navLinks,
   fontClassName,
   initialSelectedSlug,
@@ -45,7 +46,7 @@ export function HomePageClient({
       <div className={gridClassName}>
         <aside className="col-start-1 py-[clamp(3rem,8vw,2rem)] md:sticky md:top-0 md:h-screen md:overflow-y-auto">
           <DirectoryPostList
-            directories={directories}
+            directoryTree={directoryTree}
             rootPosts={rootPosts}
             onPostSelect={setSelectedPostSlug}
           />

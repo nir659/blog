@@ -1,4 +1,3 @@
-# 👋 Hey there — Welcome to my blog!
+# Welcome
 
-- Click directorys on the left to navigate through the blog.
-- Visit the Source Code and other links, bottom right.
+Start exploring by selecting a post from the directory on the left.

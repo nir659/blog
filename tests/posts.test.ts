@@ -48,14 +48,21 @@ describe("getPostIndex", () => {
     const directoryPaths = index.directories.map((directory) => directory.path);
     expect(directoryPaths).toEqual(["guides", "guides/basics"]);
 
-    const guides = index.directories.find((directory) => directory.label === "guides");
+    const guides = index.directories.find((directory) => directory.path === "guides");
+    expect(guides?.label).toBe("guides");
     expect(guides?.posts.map((post) => post.slug)).toEqual([
       "guides/advanced-topics",
       "guides/getting-started",
+      "guides/basics/quickstart",
     ]);
-    expect(guides?.posts.map((post) => post.title)).toEqual(["Advanced Topics", "Getting Started"]);
+    expect(guides?.posts.map((post) => post.title)).toEqual([
+      "Advanced Topics",
+      "Getting Started",
+      "Quickstart",
+    ]);
 
-    const basics = index.directories.find((directory) => directory.label === "guides/basics");
+    const basics = index.directories.find((directory) => directory.path === "guides/basics");
+    expect(basics?.label).toBe("basics");
     expect(basics?.posts).toEqual([
       {
         directory: "guides/basics",
@@ -63,5 +70,21 @@ describe("getPostIndex", () => {
         title: "Quickstart",
       },
     ]);
+
+    expect(index.directoryTree.label).toBe("root");
+    expect(index.directoryTree.path).toBe("");
+    expect(index.directoryTree.posts.map((post) => post.slug)).toEqual(["welcome"]);
+
+    const guidesTree = index.directoryTree.directories.find(
+      (directory) => directory.label === "guides"
+    );
+    expect(guidesTree?.posts.map((post) => post.slug)).toEqual([
+      "guides/advanced-topics",
+      "guides/getting-started",
+    ]);
+    expect(guidesTree?.directories.map((child) => child.label)).toEqual(["basics"]);
+
+    const basicsTree = guidesTree?.directories[0];
+    expect(basicsTree?.posts.map((post) => post.slug)).toEqual(["guides/basics/quickstart"]);
   });
 });

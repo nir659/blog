@@ -1,58 +1,114 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type { DirectoryMeta, PostMeta } from "@/app/lib/posts";
+import { useState } from "react";
+import type { DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 import { DirectoryItem } from "./directory-item";
 
 type DirectoryPostListProps = {
-  directories: DirectoryMeta[];
+  directoryTree: DirectoryTreeNode;
   rootPosts: PostMeta[];
   onPostSelect?: (slug: string) => void;
 };
 
-// renders expandable directory folders, including empty directories
-export function DirectoryPostList({ directories, rootPosts, onPostSelect }: DirectoryPostListProps) {
-  const directoryKeys = useMemo(
-    () => directories.map((directory) => directory.path),
-    [directories]
-  );
-  const [openDirectory, setOpenDirectory] = useState<string | null>(
-    directoryKeys[0] ?? null
-  );
-  const activeDirectory =
-    openDirectory && directoryKeys.includes(openDirectory)
-      ? openDirectory
-      : directoryKeys[0] ?? null;
+type DirectoryBranchProps = {
+  node: DirectoryTreeNode;
+  depth: number;
+  defaultOpen?: boolean;
+  onPostSelect?: (slug: string) => void;
+};
 
-  if (directories.length === 0 && rootPosts.length === 0) {
+function DirectoryBranch({
+  node,
+  depth,
+  defaultOpen = false,
+  onPostSelect,
+}: DirectoryBranchProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  const content = (
+    <div className="flex flex-col gap-3">
+      {node.posts.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {node.posts.map((post) => (
+            <DirectoryItem
+              key={post.slug}
+              type="post"
+              post={post}
+              depth={depth + 1}
+              onPostSelect={onPostSelect}
+            />
+          ))}
+        </ul>
+      )}
+
+      {node.directories.length > 0 && (
+        <div className="flex flex-col">
+          {node.directories.map((child) => (
+            <DirectoryBranch
+              key={child.path || child.label}
+              node={child}
+              depth={depth + 1}
+              onPostSelect={onPostSelect}
+            />
+          ))}
+        </div>
+      )}
+
+      {node.posts.length === 0 && node.directories.length === 0 && (
+        <p className="text-[0.85rem] opacity-50">nothing is here</p>
+      )}
+    </div>
+  );
+
+  return (
+    <DirectoryItem
+      type="directory"
+      node={node}
+      depth={depth}
+      isOpen={isOpen}
+      onToggle={() => setIsOpen((previous) => !previous)}
+    >
+      {content}
+    </DirectoryItem>
+  );
+}
+
+// renders expandable directory folders, including empty directories
+export function DirectoryPostList({
+  directoryTree,
+  rootPosts,
+  onPostSelect,
+}: DirectoryPostListProps) {
+  const topLevelDirectories = directoryTree.directories;
+  const firstDirectoryPath = topLevelDirectories[0]?.path ?? null;
+
+  const hasDirectories = topLevelDirectories.length > 0;
+  const hasRootPosts = rootPosts.length > 0;
+
+  if (!hasDirectories && !hasRootPosts) {
     return null;
   }
 
-  const handleToggle = (key: string) => {
-    setOpenDirectory((previous) => (previous === key ? null : key));
-  };
-
-  const containerClass = rootPosts.length > 0 && directories.length > 0
+  const rootPostContainerClass = hasDirectories
     ? ""
-    : rootPosts.length > 0 ? "pt-2" : "";
+    : hasRootPosts
+      ? "pt-2"
+      : "";
 
   return (
     <section id="archive" className="flex flex-col">
-      {directories.map((directory) => {
-        const key = directory.path;
-        return (
-          <DirectoryItem
-            key={key}
-            type="directory"
-            directory={directory}
-            isOpen={activeDirectory === key}
-            onToggle={() => handleToggle(key)}
-            onPostSelect={onPostSelect}
-          />
-        );
-      })}
-      {rootPosts.length > 0 && (
-        <div className={containerClass}>
+      {topLevelDirectories.map((directory) => (
+        <DirectoryBranch
+          key={directory.path || directory.label}
+          node={directory}
+          depth={0}
+          defaultOpen={directory.path === firstDirectoryPath}
+          onPostSelect={onPostSelect}
+        />
+      ))}
+
+      {hasRootPosts && (
+        <div className={rootPostContainerClass}>
           <ul className="flex flex-col">
             {rootPosts.map((post) => (
               <DirectoryItem

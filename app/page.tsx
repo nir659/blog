@@ -10,16 +10,16 @@ const spaceMono = Space_Mono({
 });
 
 const navLinks = [
-  { href: "#about", label: "About" },
-  { href: "#archive", label: "Archive" },
-  { href: "#contact", label: "Contact" },
+  { href: "#about", label: "Home" },
+  { href: "#archive", label: "Posts" },
+  { href: "#contact", label: "Links" },
 ];
 
 // Force dynamic rendering for fresh post data
 export const revalidate = 0;
 
 async function HomePageContent() {
-  const { directories, rootPosts } = await getPostIndex();
+  const { directories, rootPosts, directoryTree } = await getPostIndex();
   const allPosts = [
     ...rootPosts,
     ...directories.flatMap((directory) => directory.posts),
@@ -38,6 +38,7 @@ async function HomePageContent() {
     <HomePageClient
       directories={directories}
       rootPosts={rootPosts}
+      directoryTree={directoryTree}
       navLinks={navLinks}
       fontClassName={spaceMono.className}
       initialSelectedSlug={initialSelectedSlug}
