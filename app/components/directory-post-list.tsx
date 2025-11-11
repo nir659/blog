@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { memo, useMemo, useState } from "react";
 import type { DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 import { DirectoryItem } from "./directory-item";
@@ -92,11 +93,10 @@ function DirectoryPostListComponent({
     return null;
   }
 
-  const rootPostContainerClass = hasDirectories
-    ? ""
-    : hasRootPosts
-      ? "pt-2"
-      : "";
+  const rootPostContainerClass = clsx(
+    "flex flex-col",
+    !hasDirectories && hasRootPosts && "pt-2"
+  );
 
   return (
     <section id="archive" className="flex flex-col">

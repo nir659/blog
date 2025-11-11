@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import type { ReactNode } from "react";
 import type { DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 
@@ -19,8 +20,10 @@ type DirectoryItemProps =
       onPostSelect?: (slug: string) => void;
     };
 
-const baseButtonClasses =
-  "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[0.9rem] transition-colors duration-150 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white/30";
+const buttonBaseClasses =
+  "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[0.9rem]";
+const buttonStateClasses =
+  "transition-colors duration-150 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white/30 hover:bg-white/5 focus-visible:bg-white/10";
 
 function ChevronIcon({ open }: { open: boolean }) {
   return (
@@ -96,7 +99,7 @@ export function DirectoryItem(props: DirectoryItemProps) {
     const contentId = directoryContentId(node);
     const paddingLeft = indentFromDepth(depth);
     const childPaddingLeft = indentFromDepth(depth + 1);
-    const hoverClasses = "hover:bg-white/5 focus-visible:bg-white/10";
+    const buttonClassName = clsx(buttonBaseClasses, buttonStateClasses);
 
     return (
       <div className="flex flex-col gap-1">
@@ -105,7 +108,7 @@ export function DirectoryItem(props: DirectoryItemProps) {
           onClick={onToggle}
           aria-expanded={isOpen}
           aria-controls={contentId}
-          className={`${baseButtonClasses} ${hoverClasses}`}
+          className={buttonClassName}
           style={{ paddingLeft }}
         >
           <ChevronIcon open={isOpen} />
@@ -131,14 +134,14 @@ export function DirectoryItem(props: DirectoryItemProps) {
 
   const { post, depth = 0, onPostSelect } = props;
   const paddingLeft = indentFromDepth(depth);
-  const hoverClasses = "hover:bg-white/5 focus-visible:bg-white/10";
+  const buttonClassName = clsx(buttonBaseClasses, buttonStateClasses);
 
   return (
     <li>
       <button
         type="button"
         onClick={() => onPostSelect?.(post.slug)}
-        className={`${baseButtonClasses} ${hoverClasses}`}
+        className={buttonClassName}
         style={{ paddingLeft }}
       >
         <DocumentIcon />

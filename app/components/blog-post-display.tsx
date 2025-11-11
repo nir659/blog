@@ -4,6 +4,7 @@ import { useEffect, useMemo, useReducer } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import { Skeleton } from "@/app/components/skeleton";
 
 type BlogPostDisplayProps = {
   selectedPostSlug: string | null;
@@ -78,6 +79,24 @@ const markdownComponents = {
     <strong className="font-semibold" {...props} />
   ),
 };
+
+function PostSkeleton() {
+  return (
+    <div className="space-y-5" aria-hidden="true">
+      <Skeleton className="h-7 w-1/2" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-5/6" />
+      <Skeleton className="h-4 w-11/12" />
+      <div className="space-y-3 rounded-md border border-white/10 p-4">
+        <Skeleton className="h-4 w-2/3" />
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+      <Skeleton className="h-4 w-4/5" />
+      <Skeleton className="h-4 w-9/12" />
+    </div>
+  );
+}
 
 // renders markdown post content or loading/error states
 export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
@@ -168,8 +187,8 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
           <p className="text-[0.95rem]">Select a post from the directory</p>
         </div>
       ) : loading ? (
-        <div className="flex items-center justify-center py-20 opacity-50">
-          <p className="text-[0.95rem]">Loading...</p>
+        <div className="py-10">
+          <PostSkeleton />
         </div>
       ) : error ? (
         <div className="flex items-center justify-center py-20 opacity-50">

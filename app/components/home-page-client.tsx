@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { memo, useCallback, useEffect, useState } from "react";
 import type { DirectoryMeta, DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 import { DirectoryPostList } from "./directory-post-list";
@@ -88,11 +89,18 @@ export function HomePageClient({
     setSelectedPostSlug((previous) => (previous === slug ? previous : slug));
   }, []);
 
-  const gridClassName = "grid w-full max-w-[1900px] grid-cols-1 md:grid-cols-[minmax(150px,200px)_1px_minmax(0,1100px)_1px_minmax(3rem,1fr)] md:gap-x-[clamp(2rem,6vw,4rem)]";
+  const gridClassName = clsx(
+    "grid w-full max-w-[1900px] grid-cols-1",
+    "md:grid-cols-[minmax(150px,200px)_1px_minmax(0,1100px)_1px_minmax(3rem,1fr)]",
+    "md:gap-x-[clamp(2rem,6vw,4rem)]"
+  );
 
   return (
     <main
-      className={`${fontClassName} flex min-h-screen justify-center px-4 sm:px-6 md:overflow-x-visible`}
+      className={clsx(
+        fontClassName,
+        "flex min-h-screen justify-center px-4 sm:px-6 md:overflow-x-visible"
+      )}
     >
       <div className={gridClassName}>
         <ArchivePane
