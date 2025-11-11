@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
 import type { DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 import { DirectoryItem } from "./directory-item";
 
@@ -44,7 +44,7 @@ function DirectoryBranch({
       {node.directories.length > 0 && (
         <div className="flex flex-col">
           {node.directories.map((child) => (
-            <DirectoryBranch
+            <MemoizedDirectoryBranch
               key={child.path || child.label}
               node={child}
               depth={depth + 1}
@@ -74,12 +74,15 @@ function DirectoryBranch({
 }
 
 // renders expandable directory folders, including empty directories
-export function DirectoryPostList({
+function DirectoryPostListComponent({
   directoryTree,
   rootPosts,
   onPostSelect,
 }: DirectoryPostListProps) {
-  const topLevelDirectories = directoryTree.directories;
+  const topLevelDirectories = useMemo(
+    () => directoryTree.directories,
+    [directoryTree]
+  );
   const firstDirectoryPath = topLevelDirectories[0]?.path ?? null;
 
   const hasDirectories = topLevelDirectories.length > 0;
@@ -98,7 +101,7 @@ export function DirectoryPostList({
   return (
     <section id="archive" className="flex flex-col">
       {topLevelDirectories.map((directory) => (
-        <DirectoryBranch
+        <MemoizedDirectoryBranch
           key={directory.path || directory.label}
           node={directory}
           depth={0}
@@ -124,3 +127,7 @@ export function DirectoryPostList({
     </section>
   );
 }
+
+const MemoizedDirectoryBranch = memo(DirectoryBranch);
+
+export const DirectoryPostList = memo(DirectoryPostListComponent);

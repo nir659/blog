@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 :root {
   color-scheme: dark;
   --background: #0b0b0b;
@@ -65,4 +64,8 @@ a {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--grid-lines) transparent;
+}
+
+.hljs {
+  background: transparent;
 }

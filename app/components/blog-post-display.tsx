@@ -1,14 +1,27 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 
 type BlogPostDisplayProps = {
   selectedPostSlug: string | null;
 };
 
+type CacheEntry = {
+  content: string | null;
+  error: string | null;
+};
+
+const postContentCache = new Map<string, CacheEntry>();
+const inFlightControllers = new Map<string, AbortController>();
+
 // Memoized markdown components to avoid recreation on every render
+function mergeClassNames(...values: Array<string | undefined>): string {
+  return values.filter(Boolean).join(" ");
+}
+
 const markdownComponents = {
   h1: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1 className="text-[2rem] font-bold mb-6 mt-8" {...props} />
@@ -32,15 +45,13 @@ const markdownComponents = {
     <li className="text-[0.95rem]" {...props} />
   ),
   code: (props: { inline?: boolean } & React.HTMLAttributes<HTMLElement>) => {
-    const { inline, ...rest } = props;
-    return inline ? (
+    const { inline, className, ...rest } = props;
+    const baseClassName = inline
+      ? "bg-[rgba(255,255,255,0.1)] px-1.5 py-0.5 text-[0.9rem] rounded-sm"
+      : "block bg-[rgba(255,255,255,0.05)] p-4 overflow-x-auto text-[0.85rem] my-4 rounded-md";
+    return (
       <code
-        className="bg-[rgba(255,255,255,0.1)] px-1.5 py-0.5 text-[0.9rem]"
-        {...rest}
-      />
-    ) : (
-      <code
-        className="block bg-[rgba(255,255,255,0.05)] p-4 overflow-x-auto text-[0.85rem] my-4"
+        className={mergeClassNames(baseClassName, className)}
         {...rest}
       />
     );
@@ -70,11 +81,7 @@ const markdownComponents = {
 
 // renders markdown post content or loading/error states
 export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
-  const [fetchState, setFetchState] = useState<{
-    slug: string | null;
-    content: string | null;
-    error: string | null;
-  }>({ slug: null, content: null, error: null });
+  const [, forceRender] = useReducer((count) => count + 1, 0);
 
   // fetches markdown content when post slug changes
   useEffect(() => {
@@ -82,7 +89,17 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
       return;
     }
 
+    const cachedEntry = postContentCache.get(selectedPostSlug);
+    if (cachedEntry && (cachedEntry.content !== null || cachedEntry.error !== null)) {
+      return;
+    }
+
+    if (inFlightControllers.has(selectedPostSlug)) {
+      return;
+    }
+
     const abortController = new AbortController();
+    inFlightControllers.set(selectedPostSlug, abortController);
 
     fetch(`/api/posts/${selectedPostSlug}`, {
       signal: abortController.signal,
@@ -95,33 +112,50 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
         return res.text();
       })
       .then((text) => {
-        setFetchState({ slug: selectedPostSlug, content: text, error: null });
+        postContentCache.set(selectedPostSlug, { content: text, error: null });
+        inFlightControllers.delete(selectedPostSlug);
+        forceRender();
       })
       .catch((err) => {
         if (err.name === "AbortError") {
+          inFlightControllers.delete(selectedPostSlug);
           return;
         }
-        setFetchState({
-          slug: selectedPostSlug,
-          content: null,
-          error: err.message || "Failed to load post",
-        });
+        const errorMessage = err.message || "Failed to load post";
+        postContentCache.set(selectedPostSlug, { content: null, error: errorMessage });
+        inFlightControllers.delete(selectedPostSlug);
+        forceRender();
       });
 
     return () => {
       abortController.abort();
+      inFlightControllers.delete(selectedPostSlug);
     };
   }, [selectedPostSlug]);
 
-  const loading = selectedPostSlug !== null && fetchState.slug !== selectedPostSlug;
-  const content = fetchState.slug === selectedPostSlug ? fetchState.content : null;
-  const error = fetchState.slug === selectedPostSlug ? fetchState.error : null;
+  const cachedEntry = selectedPostSlug
+    ? postContentCache.get(selectedPostSlug)
+    : null;
+  const content =
+    cachedEntry && cachedEntry.content !== null ? cachedEntry.content : null;
+  const error = cachedEntry?.error ?? null;
+
+  const loading =
+    !!selectedPostSlug &&
+    (!cachedEntry ||
+      (cachedEntry.content === null &&
+        cachedEntry.error === null &&
+        inFlightControllers.has(selectedPostSlug)));
 
   // Memoize the rendered markdown to avoid re-parsing identical content
   const renderedContent = useMemo(() => {
     if (!content) return null;
     return (
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeHighlight]}
+        components={markdownComponents}
+      >
         {content}
       </ReactMarkdown>
     );
@@ -153,4 +187,3 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
     </>
   );
 }
-

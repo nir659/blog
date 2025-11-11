@@ -18,6 +18,11 @@ const navLinks = [
 // Force dynamic rendering for fresh post data
 export const revalidate = 0;
 
+function normalizedSlugTail(slug: string): string {
+  const tail = slug.split("/").pop() ?? "";
+  return tail.replace(/(\.[a-z0-9]+)+$/gi, "").toLowerCase();
+}
+
 type HomePageContentProps = {
   initialSlugFromQuery: string | null;
 };
@@ -27,17 +32,19 @@ async function HomePageContent({ initialSlugFromQuery }: HomePageContentProps) {
   const allPosts = getAllPostsFromTree(directoryTree);
 
   const welcomePost = allPosts.find(
-    (post) => post.slug.split("/").pop()?.toLowerCase() === "welcome"
+    (post) => normalizedSlugTail(post.slug) === "welcome"
   );
 
   const matchesQuerySlug = initialSlugFromQuery
     ? allPosts.some((post) => post.slug === initialSlugFromQuery)
     : false;
 
+  const firstAvailableSlug = rootPosts[0]?.slug ?? allPosts[0]?.slug ?? null;
+
   const initialSelectedSlug =
     (matchesQuerySlug ? initialSlugFromQuery : null) ??
     welcomePost?.slug ??
-    allPosts[0]?.slug ??
+    firstAvailableSlug ??
     null;
 
   return (
