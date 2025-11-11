@@ -19,20 +19,42 @@ type DirectoryItemProps =
       onPostSelect?: (slug: string) => void;
     };
 
-function FolderClosedIcon() {
+const baseButtonClasses =
+  "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[0.9rem] transition-colors duration-150 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white/30";
+
+function ChevronIcon({ open }: { open: boolean }) {
   return (
     <svg
-      width="18"
-      height="18"
+      width="12"
+      height="12"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
-      strokeLinecap="square"
-      strokeLinejoin="miter"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`transition-transform duration-200 ${open ? "rotate-90" : ""}`}
       aria-hidden="true"
     >
-      <path d="M3 7v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-9l-2-2H5a2 2 0 0 0-2 2z" />
+      <polyline points="9 6 15 12 9 18" />
+    </svg>
+  );
+}
+
+function FolderIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
     </svg>
   );
 }
@@ -40,14 +62,14 @@ function FolderClosedIcon() {
 function DocumentIcon() {
   return (
     <svg
-      width="18"
-      height="18"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="square"
-      strokeLinejoin="miter"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -63,8 +85,8 @@ function directoryContentId(node: DirectoryTreeNode): string {
 }
 
 function indentFromDepth(depth: number): string {
-  const base = 0.4;
-  const step = 0.3;
+  const base = 0.25;
+  const step = 0.65;
   return `${base + depth * step}rem`;
 }
 
@@ -72,21 +94,23 @@ export function DirectoryItem(props: DirectoryItemProps) {
   if (props.type === "directory") {
     const { node, depth, isOpen, onToggle, children } = props;
     const contentId = directoryContentId(node);
-    const buttonPaddingLeft = indentFromDepth(depth);
-    const contentPaddingLeft = indentFromDepth(depth + 1);
+    const paddingLeft = indentFromDepth(depth);
+    const childPaddingLeft = indentFromDepth(depth + 1);
+    const hoverClasses = "hover:bg-white/5 focus-visible:bg-white/10";
 
     return (
-      <div>
+      <div className="flex flex-col gap-1">
         <button
           type="button"
           onClick={onToggle}
           aria-expanded={isOpen}
           aria-controls={contentId}
-          className="flex w-full items-center gap-2 py-2 text-left transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70 cursor-pointer"
-          style={{ paddingLeft: buttonPaddingLeft }}
+          className={`${baseButtonClasses} ${hoverClasses}`}
+          style={{ paddingLeft }}
         >
-          <FolderClosedIcon />
-          <span className="font-normal">{node.label}/</span>
+          <ChevronIcon open={isOpen} />
+          <FolderIcon />
+          <span className="font-normal">{node.label}</span>
         </button>
 
         <div
@@ -95,7 +119,7 @@ export function DirectoryItem(props: DirectoryItemProps) {
             isOpen ? "max-h-[1500px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="pb-1" style={{ paddingLeft: contentPaddingLeft }}>
+          <div className="pb-1" style={{ paddingLeft: childPaddingLeft }}>
             {children ?? (
               <p className="text-[0.85rem] opacity-50">nothing is here</p>
             )}
@@ -107,19 +131,18 @@ export function DirectoryItem(props: DirectoryItemProps) {
 
   const { post, depth = 0, onPostSelect } = props;
   const paddingLeft = indentFromDepth(depth);
+  const hoverClasses = "hover:bg-white/5 focus-visible:bg-white/10";
 
   return (
-    <li
-      className="flex items-center gap-3 py-1 pr-2"
-      style={{ paddingLeft }}
-    >
-      <DocumentIcon />
+    <li>
       <button
         type="button"
         onClick={() => onPostSelect?.(post.slug)}
-        className="block w-full text-left text-[0.9rem] transition-opacity duration-150 hover:opacity-70 focus:outline-none focus:opacity-70 cursor-pointer"
+        className={`${baseButtonClasses} ${hoverClasses}`}
+        style={{ paddingLeft }}
       >
-        {post.title}
+        <DocumentIcon />
+        <span>{post.title}</span>
       </button>
     </li>
   );
