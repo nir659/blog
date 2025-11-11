@@ -26,7 +26,7 @@ function DirectoryBranch({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const content = (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col">
       {node.posts.length > 0 && (
         <ul className="flex flex-col gap-2">
           {node.posts.map((post) => (

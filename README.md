@@ -64,6 +64,11 @@ The first post or a file named `welcome.md` is shown by default.
 
 Post changes appear immediately on the website since the app fetches fresh data on every request.
 
+## Configuration
+
+- `SITE_URL` — Canonical site origin (e.g., `https://blog.example.com`) used for metadata, RSS, and the sitemap.
+- `PROD_URL` — Optional fallback if `SITE_URL` is not set (handy for provider-supplied URLs).
+
 ## License
 
 MIT. See `LICENSE` for details.

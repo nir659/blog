@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { Space_Mono } from "next/font/google";
 import { HomePageClient } from "@/app/components/home-page-client";
-import { getPostIndex } from "@/app/lib/posts";
+import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
 
 const spaceMono = Space_Mono({
   subsets: ["latin"],
@@ -18,18 +18,24 @@ const navLinks = [
 // Force dynamic rendering for fresh post data
 export const revalidate = 0;
 
-async function HomePageContent() {
+type HomePageContentProps = {
+  initialSlugFromQuery: string | null;
+};
+
+async function HomePageContent({ initialSlugFromQuery }: HomePageContentProps) {
   const { directories, rootPosts, directoryTree } = await getPostIndex();
-  const allPosts = [
-    ...rootPosts,
-    ...directories.flatMap((directory) => directory.posts),
-  ];
+  const allPosts = getAllPostsFromTree(directoryTree);
 
   const welcomePost = allPosts.find(
     (post) => post.slug.split("/").pop()?.toLowerCase() === "welcome"
   );
 
+  const matchesQuerySlug = initialSlugFromQuery
+    ? allPosts.some((post) => post.slug === initialSlugFromQuery)
+    : false;
+
   const initialSelectedSlug =
+    (matchesQuerySlug ? initialSlugFromQuery : null) ??
     welcomePost?.slug ??
     allPosts[0]?.slug ??
     null;
@@ -46,7 +52,32 @@ async function HomePageContent() {
   );
 }
 
-export default function HomePage() {
+type HomePageProps = {
+  searchParams?: Promise<{ slug?: string | string[] } | undefined>;
+};
+
+function normalizeSlugFromSearchParams(
+  value: string | string[] | undefined
+): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const slugValue = Array.isArray(value) ? value[0] : value;
+
+  try {
+    const decoded = decodeURIComponent(slugValue);
+    const trimmed = decoded.trim().replace(/^\/+|\/+$/g, "");
+    return trimmed || null;
+  } catch {
+    return null;
+  }
+}
+
+export default async function HomePage({ searchParams }: HomePageProps = {}) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const slugFromQuery = normalizeSlugFromSearchParams(resolvedSearchParams?.slug);
+
   return (
     <Suspense
       fallback={
@@ -55,7 +86,7 @@ export default function HomePage() {
         </div>
       }
     >
-      <HomePageContent />
+      <HomePageContent initialSlugFromQuery={slugFromQuery} />
     </Suspense>
   );
 }

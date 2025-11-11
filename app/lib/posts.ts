@@ -2,7 +2,8 @@ import "server-only";
 
 import type { Dirent } from "fs";
 import { readdir } from "fs/promises";
-import { join, resolve } from "path";
+import { join } from "path";
+import { getPostsDirectory } from "@/app/lib/post-paths";
 
 export type PostMeta = {
   directory: string;
@@ -29,9 +30,7 @@ export type PostIndex = {
   directoryTree: DirectoryTreeNode;
 };
 
-const POSTS_DIRECTORY = process.env.POSTS_DIRECTORY
-  ? resolve(process.env.POSTS_DIRECTORY)
-  : join(process.cwd(), "app", "posts");
+const POSTS_DIRECTORY = getPostsDirectory();
 const MD_EXTENSION = ".md";
 
 function formatTitleFromSlug(slug: string): string {
@@ -129,6 +128,10 @@ function flattenDirectoryTree(node: DirectoryTreeNode): DirectoryMeta[] {
   }
 
   return flattened;
+}
+
+export function getAllPostsFromTree(node: DirectoryTreeNode): PostMeta[] {
+  return collectPostsFromSubtree(node).sort((a, b) => a.slug.localeCompare(b.slug));
 }
 
 export async function getPostIndex(): Promise<PostIndex> {

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { getSiteUrl, withSiteUrl } from "@/app/lib/site";
 
-const siteUrl = process.env.PUBLIC_SITE_URL ?? "https://example.com";
+const siteUrl = getSiteUrl();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
     siteName: "NIR / Blog",
     images: [
       {
-        url: `${siteUrl}/screenshots/home.png`,
+        url: withSiteUrl("/screenshots/home.png"),
         width: 1600,
         height: 900,
         alt: "blog",
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "NIR / Blog",
     description: "Discover long-form Markdown posts rendered with a modern, high-contrast reading experience.",
-    images: [`${siteUrl}/screenshots/home.png`],
+    images: [withSiteUrl("/screenshots/home.png")],
   },
 };
 

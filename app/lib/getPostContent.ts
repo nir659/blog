@@ -1,39 +1,14 @@
 import "server-only";
 
 import { readFile } from "fs/promises";
-import { join, normalize, resolve, sep } from "path";
-
-function isValidSegment(segment: string): boolean {
-  return /^[a-z0-9.-]+$/i.test(segment) && !segment.startsWith('.') && !segment.endsWith('.');
-}
+import { resolvePostFilePath } from "@/app/lib/post-paths";
 
 // reads markdown file from app/posts/ directory
 export async function getPostContent(slug: string | string[]): Promise<string | null> {
   try {
-    const postsDirectory = process.env.POSTS_DIRECTORY
-      ? resolve(process.env.POSTS_DIRECTORY)
-      : join(process.cwd(), "app", "posts");
-    const normalizedPostsDirectory = normalize(postsDirectory + sep);
+    const filePath = resolvePostFilePath(slug);
 
-    const slugSegments = Array.isArray(slug) ? slug : slug.split("/");
-
-    const safeSegments = slugSegments
-      .map((segment) => decodeURIComponent(segment).trim())
-      .filter(Boolean)
-      .filter((segment) => !segment.includes("..") && !segment.includes("\\"))
-      .filter(isValidSegment);
-
-    if (safeSegments.length !== slugSegments.length) {
-      return null;
-    }
-
-    if (safeSegments.length === 0) {
-      return null;
-    }
-
-    const filePath = normalize(join(postsDirectory, ...safeSegments) + ".md");
-
-    if (!filePath.startsWith(normalizedPostsDirectory)) {
+    if (!filePath) {
       return null;
     }
 
