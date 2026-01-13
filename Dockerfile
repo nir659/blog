@@ -33,7 +33,15 @@ ENV NODE_ENV=production \
 
 RUN corepack enable
 
-RUN mkdir -p /app /app/posts && chown -R node:node /app
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends nginx \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY nginx.conf /etc/nginx/nginx.conf
+
+RUN mkdir -p /tmp/nginx \
+    && mkdir -p /app /app/posts \
+    && chown -R node:node /app /tmp/nginx
 
 USER node
 
@@ -50,4 +58,6 @@ COPY --from=builder --chown=node:node /app/app/posts ./app/posts
 
 EXPOSE 3000
 
-CMD ["pnpm", "start"]
+EXPOSE 8080
+
+CMD ["sh", "-c", "pnpm start & exec nginx -g 'daemon off;'"]

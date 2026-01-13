@@ -14,6 +14,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@": projectRoot,
       "server-only": resolve(projectRoot, "tests/mocks/server-only.ts"),
     },
   },

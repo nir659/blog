@@ -6,6 +6,10 @@
   --grid-lines: rgb(35, 35, 35);
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   padding: 0;

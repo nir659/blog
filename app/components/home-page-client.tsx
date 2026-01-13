@@ -4,9 +4,10 @@ import clsx from "clsx";
 import { memo, useCallback, useEffect, useState } from "react";
 import type { DirectoryMeta, DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 import { DirectoryPostList } from "./directory-post-list";
-import { BlogPostDisplay } from "./blog-post-display";
+import { BlogPostDisplay, type Heading } from "./blog-post-display";
 import { Main } from "./home";
-import { SiteFooter } from "./site-footer";
+import { SiteFooter, MobileFooter } from "./site-footer";
+import { TableOfContents } from "./table-of-contents";
 
 type NavLink = {
   href: string;
@@ -58,13 +59,22 @@ function GridDivider({ column }: { column: number }) {
 type ContentAreaProps = {
   navLinks: NavLink[];
   selectedPostSlug: string | null;
+  onHeadingsChange: (headings: Heading[]) => void;
 };
 
-function ContentArea({ navLinks, selectedPostSlug }: ContentAreaProps) {
+function ContentArea({
+  navLinks,
+  selectedPostSlug,
+  onHeadingsChange,
+}: ContentAreaProps) {
   return (
     <section className="col-start-1 flex flex-col gap-[clamp(2rem,6vw,3.5rem)] py-[clamp(3rem,8vw,2rem)] md:col-start-3">
       <Main navLinks={navLinks} />
-      <BlogPostDisplay selectedPostSlug={selectedPostSlug} />
+      <BlogPostDisplay
+        selectedPostSlug={selectedPostSlug}
+        onHeadingsChange={onHeadingsChange}
+      />
+      <MobileFooter />
     </section>
   );
 }
@@ -80,6 +90,7 @@ export function HomePageClient({
   const [selectedPostSlug, setSelectedPostSlug] = useState<string | null>(
     initialSelectedSlug
   );
+  const [headings, setHeadings] = useState<Heading[]>([]);
 
   useEffect(() => {
     setSelectedPostSlug(initialSelectedSlug);
@@ -87,6 +98,10 @@ export function HomePageClient({
 
   const handlePostSelect = useCallback((slug: string) => {
     setSelectedPostSlug((previous) => (previous === slug ? previous : slug));
+  }, []);
+
+  const handleHeadingsChange = useCallback((newHeadings: Heading[]) => {
+    setHeadings(newHeadings);
   }, []);
 
   const gridClassName = clsx(
@@ -109,9 +124,16 @@ export function HomePageClient({
           onPostSelect={handlePostSelect}
         />
         <GridDivider column={2} />
-        <ContentArea navLinks={navLinks} selectedPostSlug={selectedPostSlug} />
+        <ContentArea
+          navLinks={navLinks}
+          selectedPostSlug={selectedPostSlug}
+          onHeadingsChange={handleHeadingsChange}
+        />
         <GridDivider column={4} />
-        <SiteFooter />
+        <aside className="col-start-5 hidden md:flex md:flex-col md:h-screen md:sticky md:top-0">
+          <TableOfContents headings={headings} />
+          <SiteFooter />
+        </aside>
       </div>
     </main>
   );
