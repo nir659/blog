@@ -1,4 +1,4 @@
-const FALLBACK_SITE_URL = "https://example.com";
+const FALLBACK_SITE_URL = "http://localhost:3000";
 
 function normalizeSiteUrl(value: string): string {
   try {

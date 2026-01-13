@@ -21,7 +21,7 @@ type DirectoryItemProps =
     };
 
 const buttonBaseClasses =
-  "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[0.9rem]";
+  "cursor-pointer flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[0.9rem]";
 const buttonStateClasses =
   "transition-colors duration-150 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white/30 hover:bg-white/5 focus-visible:bg-white/10";
 
