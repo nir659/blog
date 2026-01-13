@@ -4,10 +4,18 @@ import { useEffect, useMemo, useReducer } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import rehypeSlug from "rehype-slug";
 import { Skeleton } from "@/app/components/skeleton";
+
+export type Heading = {
+  id: string;
+  text: string;
+  level: 2 | 3;
+};
 
 type BlogPostDisplayProps = {
   selectedPostSlug: string | null;
+  onHeadingsChange?: (headings: Heading[]) => void;
 };
 
 type CacheEntry = {
@@ -18,67 +26,34 @@ type CacheEntry = {
 const postContentCache = new Map<string, CacheEntry>();
 const inFlightControllers = new Map<string, AbortController>();
 
-// Memoized markdown components to avoid recreation on every render
-function mergeClassNames(...values: Array<string | undefined>): string {
-  return values.filter(Boolean).join(" ");
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/--+/g, "-")
+    .trim();
 }
 
-const markdownComponents = {
-  h1: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h1 className="text-[2rem] font-bold mb-6 mt-8" {...props} />
-  ),
-  h2: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h2 className="text-[1.5rem] font-semibold mb-4 mt-6" {...props} />
-  ),
-  h3: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h3 className="text-[1.2rem] font-semibold mb-3 mt-5" {...props} />
-  ),
-  p: ({ ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p className="mb-4 leading-relaxed text-[0.95rem]" {...props} />
-  ),
-  ul: ({ ...props }: React.HTMLAttributes<HTMLUListElement>) => (
-    <ul className="list-disc list-inside mb-4 space-y-2" {...props} />
-  ),
-  ol: ({ ...props }: React.HTMLAttributes<HTMLOListElement>) => (
-    <ol className="list-decimal list-inside mb-4 space-y-2" {...props} />
-  ),
-  li: ({ ...props }: React.HTMLAttributes<HTMLLIElement>) => (
-    <li className="text-[0.95rem]" {...props} />
-  ),
-  code: (props: { inline?: boolean } & React.HTMLAttributes<HTMLElement>) => {
-    const { inline, className, ...rest } = props;
-    const baseClassName = inline
-      ? "bg-[rgba(255,255,255,0.1)] px-1.5 py-0.5 text-[0.9rem] rounded-sm"
-      : "block bg-[rgba(255,255,255,0.05)] p-4 overflow-x-auto text-[0.85rem] my-4 rounded-md";
-    return (
-      <code
-        className={mergeClassNames(baseClassName, className)}
-        {...rest}
-      />
-    );
-  },
-  pre: ({ ...props }: React.HTMLAttributes<HTMLPreElement>) => (
-    <pre className="mb-4" {...props} />
-  ),
-  blockquote: ({ ...props }: React.HTMLAttributes<HTMLQuoteElement>) => (
-    <blockquote
-      className="border-l-2 border-[var(--grid-lines)] pl-4 italic opacity-80 my-4"
-      {...props}
-    />
-  ),
-  hr: ({ ...props }: React.HTMLAttributes<HTMLHRElement>) => (
-    <hr className="border-[var(--grid-lines)] my-8" {...props} />
-  ),
-  a: ({ ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-    <a
-      className="underline transition-opacity duration-150 hover:opacity-70"
-      {...props}
-    />
-  ),
-  strong: ({ ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <strong className="font-semibold" {...props} />
-  ),
-};
+function extractHeadingsFromMarkdown(markdown: string): Heading[] {
+  const headings: Heading[] = [];
+  const lines = markdown.split("\n");
+
+  for (const line of lines) {
+    const h2Match = line.match(/^##\s+(.+)$/);
+    const h3Match = line.match(/^###\s+(.+)$/);
+
+    if (h2Match) {
+      const text = h2Match[1].trim();
+      headings.push({ id: slugify(text), text, level: 2 });
+    } else if (h3Match) {
+      const text = h3Match[1].trim();
+      headings.push({ id: slugify(text), text, level: 3 });
+    }
+  }
+
+  return headings;
+}
 
 function PostSkeleton() {
   return (
@@ -99,7 +74,10 @@ function PostSkeleton() {
 }
 
 // renders markdown post content or loading/error states
-export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
+export function BlogPostDisplay({
+  selectedPostSlug,
+  onHeadingsChange,
+}: BlogPostDisplayProps) {
   const [, forceRender] = useReducer((count) => count + 1, 0);
 
   // fetches markdown content when post slug changes
@@ -109,7 +87,10 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
     }
 
     const cachedEntry = postContentCache.get(selectedPostSlug);
-    if (cachedEntry && (cachedEntry.content !== null || cachedEntry.error !== null)) {
+    if (
+      cachedEntry &&
+      (cachedEntry.content !== null || cachedEntry.error !== null)
+    ) {
       return;
     }
 
@@ -141,7 +122,10 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
           return;
         }
         const errorMessage = err.message || "Failed to load post";
-        postContentCache.set(selectedPostSlug, { content: null, error: errorMessage });
+        postContentCache.set(selectedPostSlug, {
+          content: null,
+          error: errorMessage,
+        });
         inFlightControllers.delete(selectedPostSlug);
         forceRender();
       });
@@ -166,14 +150,83 @@ export function BlogPostDisplay({ selectedPostSlug }: BlogPostDisplayProps) {
         cachedEntry.error === null &&
         inFlightControllers.has(selectedPostSlug)));
 
+  // Extract headings from content and notify parent
+  const headings = useMemo(() => {
+    if (!content) return [];
+    return extractHeadingsFromMarkdown(content);
+  }, [content]);
+
+  useEffect(() => {
+    onHeadingsChange?.(headings);
+  }, [headings, onHeadingsChange]);
+
   // Memoize the rendered markdown to avoid re-parsing identical content
   const renderedContent = useMemo(() => {
     if (!content) return null;
     return (
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight]}
-        components={markdownComponents}
+        rehypePlugins={[rehypeHighlight, rehypeSlug]}
+        components={{
+          h1: (props) => (
+            <h1 className="text-[2rem] font-bold mb-6 mt-8" {...props} />
+          ),
+          h2: (props) => (
+            <h2
+              className="text-[1.5rem] font-semibold mb-4 mt-6 scroll-mt-6"
+              {...props}
+            />
+          ),
+          h3: (props) => (
+            <h3
+              className="text-[1.2rem] font-semibold mb-3 mt-5 scroll-mt-6"
+              {...props}
+            />
+          ),
+          p: (props) => (
+            <p className="mb-4 leading-relaxed text-[0.95rem]" {...props} />
+          ),
+          ul: (props) => (
+            <ul className="list-disc list-inside mb-4 space-y-2" {...props} />
+          ),
+          ol: (props) => (
+            <ol
+              className="list-decimal list-inside mb-4 space-y-2"
+              {...props}
+            />
+          ),
+          li: (props) => <li className="text-[0.95rem]" {...props} />,
+          code: (props) => {
+            const { className, ...rest } = props;
+            const isInline = !className?.includes("language-");
+            const baseClassName = isInline
+              ? "bg-[rgba(255,255,255,0.1)] px-1.5 py-0.5 text-[0.9rem] rounded-sm"
+              : "block bg-[rgba(255,255,255,0.05)] p-4 overflow-x-auto text-[0.85rem] my-4 rounded-md";
+            return (
+              <code
+                className={[baseClassName, className].filter(Boolean).join(" ")}
+                {...rest}
+              />
+            );
+          },
+          pre: (props) => <pre className="mb-4" {...props} />,
+          blockquote: (props) => (
+            <blockquote
+              className="border-l-2 border-[var(--grid-lines)] pl-4 italic opacity-80 my-4"
+              {...props}
+            />
+          ),
+          hr: (props) => (
+            <hr className="border-[var(--grid-lines)] my-8" {...props} />
+          ),
+          a: (props) => (
+            <a
+              className="underline transition-opacity duration-150 hover:opacity-70"
+              {...props}
+            />
+          ),
+          strong: (props) => <strong className="font-semibold" {...props} />,
+        }}
       >
         {content}
       </ReactMarkdown>
