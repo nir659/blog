@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -10,7 +10,7 @@ import { Skeleton } from "@/app/components/skeleton";
 export type Heading = {
   id: string;
   text: string;
-  level: 2 | 3;
+  level: 1 | 2;
 };
 
 type BlogPostDisplayProps = {
@@ -26,31 +26,20 @@ type CacheEntry = {
 const postContentCache = new Map<string, CacheEntry>();
 const inFlightControllers = new Map<string, AbortController>();
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/--+/g, "-")
-    .trim();
-}
-
-function extractHeadingsFromMarkdown(markdown: string): Heading[] {
+// Extract headings from the rendered DOM to ensure IDs match exactly
+function extractHeadingsFromDOM(container: HTMLElement): Heading[] {
   const headings: Heading[] = [];
-  const lines = markdown.split("\n");
+  const elements = container.querySelectorAll("h1[id], h2[id]");
 
-  for (const line of lines) {
-    const h2Match = line.match(/^##\s+(.+)$/);
-    const h3Match = line.match(/^###\s+(.+)$/);
+  elements.forEach((el) => {
+    const level = el.tagName === "H1" ? 1 : 2;
+    const id = el.getAttribute("id");
+    const text = el.textContent?.trim() || "";
 
-    if (h2Match) {
-      const text = h2Match[1].trim();
-      headings.push({ id: slugify(text), text, level: 2 });
-    } else if (h3Match) {
-      const text = h3Match[1].trim();
-      headings.push({ id: slugify(text), text, level: 3 });
+    if (id && text) {
+      headings.push({ id, text, level: level as 1 | 2 });
     }
-  }
+  });
 
   return headings;
 }
@@ -79,6 +68,7 @@ export function BlogPostDisplay({
   onHeadingsChange,
 }: BlogPostDisplayProps) {
   const [, forceRender] = useReducer((count) => count + 1, 0);
+  const articleRef = useRef<HTMLElement>(null);
 
   // fetches markdown content when post slug changes
   useEffect(() => {
@@ -150,15 +140,23 @@ export function BlogPostDisplay({
         cachedEntry.error === null &&
         inFlightControllers.has(selectedPostSlug)));
 
-  // Extract headings from content and notify parent
-  const headings = useMemo(() => {
-    if (!content) return [];
-    return extractHeadingsFromMarkdown(content);
-  }, [content]);
-
+  // Extract headings from DOM after render and notify parent
   useEffect(() => {
-    onHeadingsChange?.(headings);
-  }, [headings, onHeadingsChange]);
+    if (!content || !articleRef.current) {
+      onHeadingsChange?.([]);
+      return;
+    }
+
+    // Small delay to ensure DOM is fully rendered
+    const timer = setTimeout(() => {
+      if (articleRef.current) {
+        const headings = extractHeadingsFromDOM(articleRef.current);
+        onHeadingsChange?.(headings);
+      }
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [content, onHeadingsChange]);
 
   // Memoize the rendered markdown to avoid re-parsing identical content
   const renderedContent = useMemo(() => {
@@ -252,7 +250,7 @@ export function BlogPostDisplay({
           <p className="text-[0.95rem]">Post not found</p>
         </div>
       ) : (
-        <article className="prose prose-invert max-w-none">
+        <article ref={articleRef} className="prose prose-invert max-w-none">
           {renderedContent}
         </article>
       )}
