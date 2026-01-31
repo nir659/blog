@@ -19,14 +19,14 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Blog",
-    template: "%s | Blog",
+    default: "Lab",
+    template: "%s | Lab",
   },
-  description: "NIR is a dark, minimal-style blog for Markdown content.",
+  description: "NIR is a dark, minimal-style Lab for Markdown content.",
   keywords: [
-    "Blog",
+    "Lab",
     "NIR",
-    "Personal Blog",
+    "Personal Lab",
   ],
   alternates: {
     canonical: "/",
@@ -36,23 +36,23 @@ export const metadata: Metadata = {
     shortcut: "/1735490735511.ico",
   },
   openGraph: {
-    title: "NIR / Blog",
+    title: "NIR / Lab",
     description: "Discover long-form Markdown posts rendered with a modern, high-contrast reading experience.",
     url: siteUrl,
-    siteName: "NIR / Blog",
+    siteName: "NIR / Lab",
     images: [
       {
         url: withSiteUrl("/screenshots/home.png"),
         width: 1600,
         height: 900,
-        alt: "blog",
+        alt: "Lab",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "NIR / Blog",
+    title: "NIR / Lab",
     description: "Discover long-form Markdown posts rendered with a modern, high-contrast reading experience.",
     images: [withSiteUrl("/screenshots/home.png")],
   },

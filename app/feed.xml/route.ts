@@ -6,7 +6,7 @@ import { buildPostPermalink, getSiteUrl, withSiteUrl } from "@/app/lib/site";
 export const dynamic = "force-static";
 export const revalidate = false;
 
-const FEED_TITLE = "Blog";
+const FEED_TITLE = "Lab";
 const FEED_SUBTITLE = "Latest updates from the markdown archive.";
 
 function escapeXml(value: string): string {

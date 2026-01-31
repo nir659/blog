@@ -1,4 +1,4 @@
-# Minimal Blog
+# Minimal Lab
 
 A minimal, dark landing page for Markdown content built with Next.js and TypeScript.
 
@@ -48,7 +48,7 @@ The app reads Markdown posts from the path in `POSTS_DIRECTORY` (default `app/po
 
 ```yaml
 services:
-  blog:
+  lab:
     volumes:
       - ./app/posts:/app/posts:Z
     environment:
@@ -66,7 +66,7 @@ Post changes appear immediately on the website since the app fetches fresh data 
 
 ## Configuration
 
-- `SITE_URL` — Canonical site origin (e.g., `https://blog.example.com`) used for metadata, RSS, and the sitemap.
+- `SITE_URL` — Canonical site origin (e.g., `https://lab.example.com`) used for metadata, RSS, and the sitemap.
 - `PROD_URL` — Optional fallback if `SITE_URL` is not set (handy for provider-supplied URLs).
 
 ## License

@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Application Overview
-- Terminal-inspired blog landing page built on the Next.js 16 App Router with React 19 Client Components.
+- Terminal-inspired Lab landing page built on the Next.js 16 App Router with React 19 Client Components.
 - Left column lists posts in collapsible directory groups; right column renders Markdown content chosen by the reader.
 - Markdown files in `app/posts/` (including nested directories) are served as plain text through `app/api/posts/[...slug]/route.ts` and rendered with `react-markdown` plus `remark-gfm`.
 - Tailwind CSS 4 powers the monospace layout; `app/globals.css` defines theme tokens such as `--grid-lines`.
