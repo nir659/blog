@@ -22,7 +22,7 @@ export function Main({ navLinks }: MainProps) {
       </div>
       <div className="mt-3 mb-3 flex items-end gap-4">
         <h1 className="text-[clamp(2.4rem,5vw,3.4rem)] leading-[1.1] m-0">
-          NIR / Blog
+          NIR / Lab
         </h1>
       </div>
       <nav className="mb-6 flex flex-wrap gap-6">
