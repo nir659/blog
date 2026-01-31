@@ -22,11 +22,21 @@ function FooterContent() {
         <li>
           <a
             className="underline decoration-[1px] underline-offset-2"
-            href="https://t.me/"
+            href="https://matrix.to/#/@nir:matrix.nir.rip"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Telegram
+            Matrix
+          </a>
+        </li>
+        <li>
+          <a
+            className="underline decoration-[1px] underline-offset-2"
+            href="https://nir.rip/GAhbMNZYJv.txt"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            PGP Key
           </a>
         </li>
         <li>
