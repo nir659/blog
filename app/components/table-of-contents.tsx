@@ -16,7 +16,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const isClickScrolling = useRef(false);
 
-  // Group h2s under their preceding h1
   const groupedHeadings = useMemo(() => {
     const groups: GroupedHeading[] = [];
     let currentGroup: GroupedHeading | null = null;
@@ -28,7 +27,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
       } else if (heading.level === 2 && currentGroup) {
         currentGroup.h2s.push(heading);
       } else if (heading.level === 2 && !currentGroup) {
-        // h2 without a preceding h1 - create a standalone entry
         groups.push({ h1: heading, h2s: [] });
       }
     }
@@ -36,7 +34,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
     return groups;
   }, [headings]);
 
-  // Scroll-based tracking
   useEffect(() => {
     if (headings.length === 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -45,10 +42,8 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
     }
 
     const handleScroll = () => {
-      // Skip if we're in the middle of a click-initiated scroll
       if (isClickScrolling.current) return;
 
-      // Get all heading elements in DOM order
       const headingElements: { id: string; top: number }[] = [];
       for (const heading of headings) {
         const el = document.getElementById(heading.id);
@@ -62,7 +57,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
 
       if (headingElements.length === 0) return;
 
-      // Find the last heading that's at or above the offset threshold
       const offset = 120;
       let currentHeading: string | null = null;
 
@@ -72,7 +66,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
         }
       }
 
-      // If no heading has been scrolled past, use the first one
       if (currentHeading === null) {
         currentHeading = headingElements[0].id;
       }
@@ -80,7 +73,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
       setActiveId(currentHeading);
     };
 
-    // Run once on mount
     handleScroll();
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -92,16 +84,12 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
       e.preventDefault();
       const element = document.getElementById(id);
       if (element) {
-        // Mark that we're doing a click-initiated scroll
         isClickScrolling.current = true;
         setActiveId(id);
 
         element.scrollIntoView({ behavior: "smooth", block: "start" });
-
-        // Update URL without triggering navigation
         window.history.pushState(null, "", `#${id}`);
 
-        // Re-enable scroll tracking after smooth scroll completes
         setTimeout(() => {
           isClickScrolling.current = false;
         }, 800);
@@ -129,7 +117,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
 
           return (
             <li key={group.h1.id}>
-              {/* H1 heading */}
               <a
                 href={`#${group.h1.id}`}
                 onClick={(e) => handleClick(e, group.h1.id)}
@@ -143,7 +130,6 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
                 {group.h1.text}
               </a>
 
-              {/* H2 headings nested under H1 */}
               {group.h2s.length > 0 && (
                 <ul className="flex flex-col gap-0.5 ml-3">
                   {group.h2s.map((h2) => {

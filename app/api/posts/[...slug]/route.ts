@@ -6,7 +6,6 @@ import {
   normalizeSlugParam,
 } from "@/app/api/posts/utils";
 
-// api route to serve markdown post content from nested directories
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string[] }> }

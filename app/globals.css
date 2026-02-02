@@ -46,7 +46,6 @@ a {
   color: inherit;
 }
 
-/* custom scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -64,7 +63,6 @@ a {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* firefox scrollbar */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--grid-lines) transparent;
@@ -72,4 +70,98 @@ a {
 
 .hljs {
   background: transparent;
+  color: #abb2bf;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-addition {
+  color: #c678dd;
+}
+
+.hljs-string,
+.hljs-attr,
+.hljs-template-variable,
+.hljs-variable,
+.hljs-template-tag {
+  color: #98c379;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-link {
+  color: #d19a66;
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: #e6c07b;
+}
+
+.hljs-function,
+.hljs-title,
+.hljs-section {
+  color: #61afef;
+}
+
+.hljs-attribute,
+.hljs-name,
+.hljs-tag {
+  color: #e06c75;
+}
+
+.hljs-meta {
+  color: #61afef;
+}
+
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: #c678dd;
+}
+
+.hljs-deletion {
+  color: #e06c75;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+pre code {
+  white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+  display: block;
+}
+
+.prose {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.prose p,
+.prose li,
+.prose blockquote {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
