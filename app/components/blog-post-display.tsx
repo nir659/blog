@@ -1,11 +1,89 @@
 "use client";
 
-import { useEffect, useMemo, useReducer, useRef } from "react";
+import {
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import { Skeleton } from "@/app/components/skeleton";
+
+function CopyIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function CodeBlock({ children }: { children: ReactNode }) {
+  const [copied, setCopied] = useState(false);
+  const preRef = useRef<HTMLPreElement>(null);
+
+  const handleCopy = useCallback(() => {
+    if (preRef.current) {
+      const code = preRef.current.querySelector("code");
+      const text = code?.textContent || preRef.current.textContent || "";
+      navigator.clipboard.writeText(text).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    }
+  }, []);
+
+  return (
+    <div className="group relative">
+      <pre
+        ref={preRef}
+        className="mb-4 bg-[rgba(255,255,255,0.05)] p-4 rounded-md overflow-x-auto text-[0.85rem] font-mono [&>code]:block [&>code]:w-full"
+      >
+        {children}
+      </pre>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="absolute top-2 right-2 p-1.5 rounded bg-white/10 opacity-0 group-hover:opacity-100 hover:bg-white/20 transition-opacity duration-150"
+        aria-label={copied ? "Copied!" : "Copy code"}
+      >
+        {copied ? <CheckIcon /> : <CopyIcon />}
+      </button>
+    </div>
+  );
+}
 
 export type Heading = {
   id: string;
@@ -26,7 +104,6 @@ type CacheEntry = {
 const postContentCache = new Map<string, CacheEntry>();
 const inFlightControllers = new Map<string, AbortController>();
 
-// Extract headings from the rendered DOM to ensure IDs match exactly
 function extractHeadingsFromDOM(container: HTMLElement): Heading[] {
   const headings: Heading[] = [];
   const elements = container.querySelectorAll("h1[id], h2[id]");
@@ -62,7 +139,6 @@ function PostSkeleton() {
   );
 }
 
-// renders markdown post content or loading/error states
 export function BlogPostDisplay({
   selectedPostSlug,
   onHeadingsChange,
@@ -70,7 +146,6 @@ export function BlogPostDisplay({
   const [, forceRender] = useReducer((count) => count + 1, 0);
   const articleRef = useRef<HTMLElement>(null);
 
-  // fetches markdown content when post slug changes
   useEffect(() => {
     if (!selectedPostSlug) {
       return;
@@ -140,14 +215,12 @@ export function BlogPostDisplay({
         cachedEntry.error === null &&
         inFlightControllers.has(selectedPostSlug)));
 
-  // Extract headings from DOM after render and notify parent
   useEffect(() => {
     if (!content || !articleRef.current) {
       onHeadingsChange?.([]);
       return;
     }
 
-    // Small delay to ensure DOM is fully rendered
     const timer = setTimeout(() => {
       if (articleRef.current) {
         const headings = extractHeadingsFromDOM(articleRef.current);
@@ -158,7 +231,6 @@ export function BlogPostDisplay({
     return () => clearTimeout(timer);
   }, [content, onHeadingsChange]);
 
-  // Memoize the rendered markdown to avoid re-parsing identical content
   const renderedContent = useMemo(() => {
     if (!content) return null;
     return (
@@ -195,19 +267,25 @@ export function BlogPostDisplay({
           ),
           li: (props) => <li className="text-[0.95rem]" {...props} />,
           code: (props) => {
-            const { className, ...rest } = props;
+            const { className, children, ...rest } = props;
             const isInline = !className?.includes("language-");
-            const baseClassName = isInline
-              ? "bg-[rgba(255,255,255,0.1)] px-1.5 py-0.5 text-[0.9rem] rounded-sm"
-              : "block bg-[rgba(255,255,255,0.05)] p-4 overflow-x-auto text-[0.85rem] my-4 rounded-md";
+            if (isInline) {
+              return (
+                <code
+                  className="bg-[rgba(255,255,255,0.1)] px-1.5 py-0.5 text-[0.9em] rounded-sm font-mono"
+                  {...rest}
+                >
+                  {children}
+                </code>
+              );
+            }
             return (
-              <code
-                className={[baseClassName, className].filter(Boolean).join(" ")}
-                {...rest}
-              />
+              <code className={className} {...rest}>
+                {children}
+              </code>
             );
           },
-          pre: (props) => <pre className="mb-4" {...props} />,
+          pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
           blockquote: (props) => (
             <blockquote
               className="border-l-2 border-[var(--grid-lines)] pl-4 italic opacity-80 my-4"
@@ -220,10 +298,52 @@ export function BlogPostDisplay({
           a: (props) => (
             <a
               className="underline transition-opacity duration-150 hover:opacity-70"
+              target={props.href?.startsWith("http") ? "_blank" : undefined}
+              rel={props.href?.startsWith("http") ? "noopener noreferrer" : undefined}
               {...props}
             />
           ),
           strong: (props) => <strong className="font-semibold" {...props} />,
+          em: (props) => <em className="italic" {...props} />,
+          del: (props) => <del className="line-through opacity-70" {...props} />,
+          table: (props) => (
+            <div className="overflow-x-auto my-4">
+              <table className="w-full border-collapse text-[0.9rem]" {...props} />
+            </div>
+          ),
+          thead: (props) => (
+            <thead className="border-b border-[var(--grid-lines)]" {...props} />
+          ),
+          tbody: (props) => <tbody {...props} />,
+          tr: (props) => (
+            <tr className="border-b border-[var(--grid-lines)] last:border-0" {...props} />
+          ),
+          th: (props) => (
+            <th className="px-3 py-2 text-left font-semibold" {...props} />
+          ),
+          td: (props) => <td className="px-3 py-2" {...props} />,
+          img: (props) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              className="max-w-full h-auto rounded-md my-4"
+              loading="lazy"
+              alt={props.alt || ""}
+              {...props}
+            />
+          ),
+          input: (props) => {
+            if (props.type === "checkbox") {
+              return (
+                <input
+                  type="checkbox"
+                  className="mr-2 accent-white"
+                  disabled
+                  {...props}
+                />
+              );
+            }
+            return <input {...props} />;
+          },
         }}
       >
         {content}
@@ -250,7 +370,7 @@ export function BlogPostDisplay({
           <p className="text-[0.95rem]">Post not found</p>
         </div>
       ) : (
-        <article ref={articleRef} className="prose prose-invert max-w-none">
+        <article ref={articleRef} className="prose prose-invert max-w-none min-w-0 overflow-x-hidden">
           {renderedContent}
         </article>
       )}

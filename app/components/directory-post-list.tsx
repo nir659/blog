@@ -74,7 +74,6 @@ function DirectoryBranch({
   );
 }
 
-// renders expandable directory folders, including empty directories
 function DirectoryPostListComponent({
   directoryTree,
   rootPosts,

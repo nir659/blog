@@ -8,7 +8,7 @@ type MainProps = {
 };
 
 const hLineClass =
-  "block h-px w-[calc(100%+8rem)] self-center bg-[var(--grid-lines)]";
+  "block h-px bg-[var(--grid-lines)] w-[calc(100%+var(--grid-gap)*2+2px)] -ml-[calc(var(--grid-gap)+1px)]";
 
 export function Main({ navLinks }: MainProps) {
   return (

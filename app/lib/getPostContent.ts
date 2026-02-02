@@ -3,7 +3,6 @@ import "server-only";
 import { readFile } from "fs/promises";
 import { resolvePostFilePath } from "@/app/lib/post-paths";
 
-// reads markdown file from app/posts/ directory
 export async function getPostContent(slug: string | string[]): Promise<string | null> {
   try {
     const filePath = resolvePostFilePath(slug);

@@ -44,43 +44,6 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
-function FolderIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-    </svg>
-  );
-}
-
-function DocumentIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-    </svg>
-  );
-}
-
 function directoryContentId(node: DirectoryTreeNode): string {
   const key = node.path || node.label || "root";
   const normalized = key.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -98,7 +61,6 @@ export function DirectoryItem(props: DirectoryItemProps) {
     const { node, depth, isOpen, onToggle, children } = props;
     const contentId = directoryContentId(node);
     const paddingLeft = indentFromDepth(depth);
-    const childPaddingLeft = indentFromDepth(depth + 1);
     const buttonClassName = clsx(buttonBaseClasses, buttonStateClasses);
 
     return (
@@ -111,8 +73,9 @@ export function DirectoryItem(props: DirectoryItemProps) {
           className={buttonClassName}
           style={{ paddingLeft }}
         >
-          <ChevronIcon open={isOpen} />
-          <FolderIcon />
+          <span className="flex w-3 shrink-0 items-center justify-center">
+            <ChevronIcon open={isOpen} />
+          </span>
           <span className="font-normal">{node.label}</span>
         </button>
 
@@ -122,7 +85,7 @@ export function DirectoryItem(props: DirectoryItemProps) {
             isOpen ? "max-h-[1500px] opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="pb-1" style={{ paddingLeft: childPaddingLeft }}>
+          <div className="pb-1">
             {children ?? (
               <p className="text-[0.85rem] opacity-50">nothing is here</p>
             )}
@@ -144,7 +107,7 @@ export function DirectoryItem(props: DirectoryItemProps) {
         className={buttonClassName}
         style={{ paddingLeft }}
       >
-        <DocumentIcon />
+        <span className="w-3 shrink-0" aria-hidden="true" />
         <span>{post.title}</span>
       </button>
     </li>

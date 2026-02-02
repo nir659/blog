@@ -11,12 +11,11 @@ const spaceMono = Space_Mono({
 });
 
 const navLinks = [
-  { href: "#about", label: "Home" },
-  { href: "#archive", label: "Posts" },
+  { href: "https://nir.rip", label: "Home", target: "_blank", rel: "noopener noreferrer" },
+  { href: "#archive", label: "Archive" },
   { href: "#contact", label: "Links" },
 ];
 
-// Force dynamic rendering for fresh post data
 export const revalidate = 0;
 
 function normalizedSlugTail(slug: string): string {

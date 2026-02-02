@@ -68,18 +68,19 @@ function ContentArea({
   onHeadingsChange,
 }: ContentAreaProps) {
   return (
-    <section className="col-start-1 flex flex-col gap-[clamp(2rem,6vw,3.5rem)] py-[clamp(3rem,8vw,2rem)] md:col-start-3">
+    <section className="col-start-1 flex flex-col gap-[clamp(1.5rem,6vw,1.5rem)] py-[clamp(1rem,8vw,2rem)] md:col-start-3">
       <Main navLinks={navLinks} />
-      <BlogPostDisplay
-        selectedPostSlug={selectedPostSlug}
-        onHeadingsChange={onHeadingsChange}
-      />
+      <div className="min-w-0 overflow-hidden">
+        <BlogPostDisplay
+          selectedPostSlug={selectedPostSlug}
+          onHeadingsChange={onHeadingsChange}
+        />
+      </div>
       <MobileFooter />
     </section>
   );
 }
 
-// client shell responsible for selection state and overall layout chrome
 export function HomePageClient({
   rootPosts,
   directoryTree,
@@ -106,15 +107,15 @@ export function HomePageClient({
 
   const gridClassName = clsx(
     "grid w-full max-w-[1900px] grid-cols-1",
-    "md:grid-cols-[minmax(150px,200px)_1px_minmax(0,1100px)_1px_minmax(3rem,1fr)]",
-    "md:gap-x-[clamp(2rem,6vw,4rem)]"
+    "md:grid-cols-[minmax(200px,300px)_1px_minmax(0,1100px)_1px_minmax(3rem,1fr)]",
+    "md:gap-x-[var(--grid-gap)]"
   );
 
   return (
     <main
       className={clsx(
         fontClassName,
-        "flex min-h-screen justify-center px-4 sm:px-6 md:overflow-x-visible"
+        "flex min-h-screen justify-center px-4 sm:px-6 [--grid-gap:clamp(2rem,6vw,4rem)]"
       )}
     >
       <div className={gridClassName}>
