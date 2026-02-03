@@ -2,7 +2,7 @@ import { stat } from "fs/promises";
 import { join, normalize, resolve, sep } from "path";
 
 function isValidSegment(segment: string): boolean {
-  return /^[a-z0-9.-]+$/i.test(segment) && !segment.startsWith(".") && !segment.endsWith(".");
+  return /^[a-z0-9 .-]+$/i.test(segment) && !segment.startsWith(".") && !segment.endsWith(".");
 }
 
 const POSTS_DIRECTORY = process.env.POSTS_DIRECTORY
