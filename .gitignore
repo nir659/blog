@@ -40,3 +40,4 @@ next-env.d.ts
 .pnpm-store/
 deploy.sh
 .obsidian/
+app/posts

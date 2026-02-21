@@ -12,7 +12,7 @@ const spaceMono = Space_Mono({
 
 const navLinks = [
   { href: "https://nir.rip", label: "Home", target: "_blank", rel: "noopener noreferrer" },
-  { href: "#archive", label: "Archive" },
+  { href: "https://github.com/nir659/notes", label: "Archive" },
   { href: "#contact", label: "Links" },
 ];
 
