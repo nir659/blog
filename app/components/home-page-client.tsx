@@ -1,7 +1,8 @@
 "use client";
 
 import clsx from "clsx";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { DirectoryMeta, DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 import { DirectoryPostList } from "./directory-post-list";
 import { BlogPostDisplay, type Heading } from "./blog-post-display";
@@ -81,6 +82,11 @@ function ContentArea({
   );
 }
 
+function buildSlugUrl(slug: string, hash?: string): string {
+  const url = `/?slug=${encodeURIComponent(slug)}`;
+  return hash ? `${url}#${hash}` : url;
+}
+
 export function HomePageClient({
   rootPosts,
   directoryTree,
@@ -88,18 +94,60 @@ export function HomePageClient({
   fontClassName,
   initialSelectedSlug,
 }: HomePageClientProps) {
+  const searchParams = useSearchParams();
   const [selectedPostSlug, setSelectedPostSlug] = useState<string | null>(
     initialSelectedSlug
   );
   const [headings, setHeadings] = useState<Heading[]>([]);
+  const isInternalNav = useRef(false);
 
   useEffect(() => {
     setSelectedPostSlug(initialSelectedSlug);
   }, [initialSelectedSlug]);
 
-  const handlePostSelect = useCallback((slug: string) => {
-    setSelectedPostSlug((previous) => (previous === slug ? previous : slug));
+  useEffect(() => {
+    if (!initialSelectedSlug) return;
+    const currentSlugParam = new URLSearchParams(window.location.search).get("slug");
+    if (!currentSlugParam) {
+      const hash = window.location.hash;
+      window.history.replaceState(null, "", buildSlugUrl(initialSelectedSlug) + hash);
+    }
+  }, [initialSelectedSlug]);
+
+  useEffect(() => {
+    if (isInternalNav.current) {
+      isInternalNav.current = false;
+      return;
+    }
+    const slugParam = searchParams.get("slug");
+    if (slugParam && slugParam !== selectedPostSlug) {
+      setSelectedPostSlug(slugParam);
+    }
+  }, [searchParams, selectedPostSlug]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const slugParam = params.get("slug");
+      if (slugParam) {
+        setSelectedPostSlug(slugParam);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
+
+  const handlePostSelect = useCallback((slug: string) => {
+    if (selectedPostSlug === slug) return;
+    isInternalNav.current = true;
+    setSelectedPostSlug(slug);
+  }, [selectedPostSlug]);
+
+  useEffect(() => {
+    if (!selectedPostSlug || !isInternalNav.current) return;
+    window.history.replaceState(null, "", buildSlugUrl(selectedPostSlug));
+  }, [selectedPostSlug]);
 
   const handleHeadingsChange = useCallback((newHeadings: Heading[]) => {
     setHeadings(newHeadings);
@@ -132,7 +180,7 @@ export function HomePageClient({
         />
         <GridDivider column={4} />
         <aside className="col-start-5 hidden md:flex md:flex-col md:h-screen md:sticky md:top-0">
-          <TableOfContents headings={headings} />
+          <TableOfContents headings={headings} currentSlug={selectedPostSlug} />
           <SiteFooter />
         </aside>
       </div>

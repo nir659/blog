@@ -5,6 +5,7 @@ import type { Heading } from "./blog-post-display";
 
 type TableOfContentsProps = {
   headings: Heading[];
+  currentSlug: string | null;
 };
 
 type GroupedHeading = {
@@ -12,7 +13,7 @@ type GroupedHeading = {
   h2s: Heading[];
 };
 
-export function TableOfContents({ headings }: TableOfContentsProps) {
+export function TableOfContents({ headings, currentSlug }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const isClickScrolling = useRef(false);
 
@@ -79,6 +80,29 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [headings]);
 
+  useEffect(() => {
+    if (headings.length === 0) return;
+
+    const handleHashChange = () => {
+      if (isClickScrolling.current) return;
+      const hash = window.location.hash.replace(/^#/, "");
+      if (!hash) return;
+
+      const decoded = decodeURIComponent(hash);
+      const valid = headings.some((h) => h.id === decoded);
+      if (!valid) return;
+
+      const el = document.getElementById(decoded);
+      if (el) {
+        setActiveId(decoded);
+        el.scrollIntoView({ behavior: "auto", block: "start" });
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, [headings]);
+
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
       e.preventDefault();
@@ -88,14 +112,18 @@ export function TableOfContents({ headings }: TableOfContentsProps) {
         setActiveId(id);
 
         element.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.pushState(null, "", `#${id}`);
+
+        const url = currentSlug
+          ? `/?slug=${encodeURIComponent(currentSlug)}#${id}`
+          : `#${id}`;
+        window.history.pushState(null, "", url);
 
         setTimeout(() => {
           isClickScrolling.current = false;
         }, 800);
       }
     },
-    []
+    [currentSlug]
   );
 
   if (groupedHeadings.length === 0) {

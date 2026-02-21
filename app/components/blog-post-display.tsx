@@ -166,7 +166,12 @@ export function BlogPostDisplay({
     const abortController = new AbortController();
     inFlightControllers.set(selectedPostSlug, abortController);
 
-    fetch(`/api/posts/${selectedPostSlug}`, {
+    const encodedSlug = selectedPostSlug
+      .split("/")
+      .map((s) => encodeURIComponent(s))
+      .join("/");
+
+    fetch(`/api/posts/${encodedSlug}`, {
       signal: abortController.signal,
       cache: "no-store",
     })
@@ -215,6 +220,8 @@ export function BlogPostDisplay({
         cachedEntry.error === null &&
         inFlightControllers.has(selectedPostSlug)));
 
+  const hasScrolledForSlug = useRef<string | null>(null);
+
   useEffect(() => {
     if (!content || !articleRef.current) {
       onHeadingsChange?.([]);
@@ -222,14 +229,24 @@ export function BlogPostDisplay({
     }
 
     const timer = setTimeout(() => {
-      if (articleRef.current) {
-        const headings = extractHeadingsFromDOM(articleRef.current);
-        onHeadingsChange?.(headings);
+      if (!articleRef.current) return;
+      const headings = extractHeadingsFromDOM(articleRef.current);
+      onHeadingsChange?.(headings);
+
+      const hash = window.location.hash.replace(/^#/, "");
+      if (!hash || hasScrolledForSlug.current === `${selectedPostSlug}#${hash}`) return;
+
+      const target = document.getElementById(decodeURIComponent(hash));
+      if (target) {
+        hasScrolledForSlug.current = `${selectedPostSlug}#${hash}`;
+        requestAnimationFrame(() => {
+          target.scrollIntoView({ behavior: "auto", block: "start" });
+        });
       }
     }, 50);
 
     return () => clearTimeout(timer);
-  }, [content, onHeadingsChange]);
+  }, [content, onHeadingsChange, selectedPostSlug]);
 
   const renderedContent = useMemo(() => {
     if (!content) return null;
