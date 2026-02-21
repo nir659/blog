@@ -65,3 +65,5 @@ jobs:
       - name: Build
         if: steps.changes.outputs.code == 'true'
         run: pnpm build
+        env:
+          POSTS_DIRECTORY: ${{ github.ref == 'refs/heads/main' && 'app/posts' || 'app/posts_dev' }}
