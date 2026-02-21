@@ -12,10 +12,10 @@ jobs:
   automerge:
     if: startsWith(github.head_ref, 'bot/sync-posts')
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Enable auto-merge (squash)
         run: gh pr merge "${{ github.event.pull_request.number }}" --squash --auto
         env:
