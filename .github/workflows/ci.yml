@@ -36,19 +36,19 @@ jobs:
         run: |
           echo "Only app/posts/** changed. Skipping lint/tests."
 
-      - name: Setup Node
-        if: steps.changes.outputs.code == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-
       - name: Enable pnpm via corepack
         if: steps.changes.outputs.code == 'true'
         run: |
           corepack enable
           corepack prepare pnpm@9 --activate
           pnpm --version
+
+      - name: Setup Node
+        if: steps.changes.outputs.code == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
 
       - name: Install
         if: steps.changes.outputs.code == 'true'
