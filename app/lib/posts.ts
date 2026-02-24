@@ -38,7 +38,7 @@ function slugifySegment(segment: string): string {
   return segment
     .trim()
     .replace(/\s+/g, "-")
-    .replace(/[^a-zA-Z0-9\-_.()+'&,]/g, "")
+    .replace(/[^a-zA-Z0-9\-_.]/g, "")
     .replace(/-{2,}/g, "-")
     .replace(/^-|-$/g, "");
 }
