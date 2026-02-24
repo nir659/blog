@@ -93,6 +93,7 @@ export type Heading = {
 
 type BlogPostDisplayProps = {
   selectedPostSlug: string | null;
+  initialContent?: string | null;
   onHeadingsChange?: (headings: Heading[]) => void;
 };
 
@@ -141,10 +142,17 @@ function PostSkeleton() {
 
 export function BlogPostDisplay({
   selectedPostSlug,
+  initialContent,
   onHeadingsChange,
 }: BlogPostDisplayProps) {
   const [, forceRender] = useReducer((count) => count + 1, 0);
   const articleRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (initialContent && selectedPostSlug && !postContentCache.has(selectedPostSlug)) {
+      postContentCache.set(selectedPostSlug, { content: initialContent, error: null });
+    }
+  }, [initialContent, selectedPostSlug]);
 
   useEffect(() => {
     if (!selectedPostSlug) {
