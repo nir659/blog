@@ -44,7 +44,12 @@ function slugifySegment(segment: string): string {
 }
 
 function formatTitle(baseName: string): string {
-  return baseName;
+  if (baseName.includes(" ")) return baseName;
+  return baseName
+    .split("-")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 function buildSlug(pathSegments: string[], fileBaseName: string): string {

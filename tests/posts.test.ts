@@ -41,6 +41,7 @@ describe("getPostIndex", () => {
       {
         directory: "root",
         slug: "welcome",
+        filePath: "welcome",
         title: "Welcome",
       },
     ]);
@@ -67,6 +68,7 @@ describe("getPostIndex", () => {
       {
         directory: "guides/basics",
         slug: "guides/basics/quickstart",
+        filePath: "guides/basics/quickstart",
         title: "Quickstart",
       },
     ]);
