@@ -8,6 +8,7 @@ import { getPostsDirectory } from "@/app/lib/post-paths";
 export type PostMeta = {
   directory: string;
   slug: string;
+  filePath: string;
   title: string;
 };
 
@@ -33,17 +34,28 @@ export type PostIndex = {
 const POSTS_DIRECTORY = getPostsDirectory();
 const MD_EXTENSION = ".md";
 
-function formatTitleFromSlug(slug: string): string {
-  return slug
-    .split("-")
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+function slugifySegment(segment: string): string {
+  return segment
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9\-_.()+'&,]/g, "")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
-function buildSlug(pathSegments: string[], fileSlug: string): string {
-  const slugSegments = [...pathSegments, fileSlug].filter(Boolean);
-  return slugSegments.join("/");
+function formatTitle(baseName: string): string {
+  return baseName;
+}
+
+function buildSlug(pathSegments: string[], fileBaseName: string): string {
+  return [...pathSegments, fileBaseName]
+    .filter(Boolean)
+    .map(slugifySegment)
+    .join("/");
+}
+
+function buildFilePath(pathSegments: string[], fileBaseName: string): string {
+  return [...pathSegments, fileBaseName].filter(Boolean).join("/");
 }
 
 function directoryLabel(pathSegments: string[]): string {
@@ -85,7 +97,8 @@ async function buildDirectoryTree(pathSegments: string[]): Promise<DirectoryTree
     return {
       directory: directoryValue,
       slug: buildSlug(pathSegments, baseName),
-      title: formatTitleFromSlug(baseName),
+      filePath: buildFilePath(pathSegments, baseName),
+      title: formatTitle(baseName),
     };
   });
 

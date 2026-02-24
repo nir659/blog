@@ -44,8 +44,8 @@ export async function GET() {
   const entryResults = await Promise.all(
     posts.map(async (post) => {
       const [content, updatedDate] = await Promise.all([
-        getPostContent(post.slug),
-        getPostLastModified(post.slug),
+        getPostContent(post.filePath),
+        getPostLastModified(post.filePath),
       ]);
 
       const body = content ?? "";

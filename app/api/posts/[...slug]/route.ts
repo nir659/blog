@@ -13,11 +13,11 @@ export async function GET(
   noStore();
 
   const { slug } = await params;
-  const slugSegments = normalizeSlugParam(slug);
+  const normalizedSlug = normalizeSlugParam(slug);
 
-  if (!slugSegments) {
+  if (!normalizedSlug) {
     return createErrorResponse("Slug is required", 400);
   }
 
-  return buildPostContentResponse(slugSegments);
+  return buildPostContentResponse(normalizedSlug);
 }
