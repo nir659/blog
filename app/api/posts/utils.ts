@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getPostContent } from "@/app/lib/getPostContent";
+import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
 
 type SlugParam = string | string[] | undefined;
 
-export function normalizeSlugParam(slug: SlugParam): string[] | null {
+export function normalizeSlugParam(slug: SlugParam): string | null {
   if (!slug) {
     return null;
   }
@@ -17,15 +18,23 @@ export function normalizeSlugParam(slug: SlugParam): string[] | null {
     return null;
   }
 
-  return normalized;
+  return normalized.join("/");
 }
 
 export function createErrorResponse(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
-export async function buildPostContentResponse(slugSegments: string[]) {
-  const content = await getPostContent(slugSegments);
+export async function buildPostContentResponse(slug: string) {
+  const { directoryTree } = await getPostIndex();
+  const allPosts = getAllPostsFromTree(directoryTree);
+  const post = allPosts.find((p) => p.slug === slug);
+
+  if (!post) {
+    return createErrorResponse("Post not found", 404);
+  }
+
+  const content = await getPostContent(post.filePath);
 
   if (!content) {
     return createErrorResponse("Post not found", 404);

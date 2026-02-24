@@ -32,11 +32,12 @@ async function HomePageContent() {
     (post) => normalizedSlugTail(post.slug) === "welcome"
   );
 
-  const firstAvailableSlug = rootPosts[0]?.slug ?? allPosts[0]?.slug ?? null;
-  const initialSelectedSlug = welcomePost?.slug ?? firstAvailableSlug ?? null;
+  const firstAvailable = rootPosts[0] ?? allPosts[0] ?? null;
+  const initialPost = welcomePost ?? firstAvailable ?? null;
+  const initialSelectedSlug = initialPost?.slug ?? null;
 
-  const initialContent = initialSelectedSlug
-    ? await getPostContent(initialSelectedSlug)
+  const initialContent = initialPost
+    ? await getPostContent(initialPost.filePath)
     : null;
 
   return (

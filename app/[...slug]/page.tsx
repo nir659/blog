@@ -66,10 +66,10 @@ export default async function NotePage({
   const { directories, rootPosts, directoryTree } = await getPostIndex();
   const allPosts = getAllPostsFromTree(directoryTree);
 
-  const postExists = allPosts.some((p) => p.slug === slugString);
-  if (!postExists) notFound();
+  const post = allPosts.find((p) => p.slug === slugString);
+  if (!post) notFound();
 
-  const content = await getPostContent(slugString);
+  const content = await getPostContent(post.filePath);
 
   const jsonLd = {
     "@context": "https://schema.org",

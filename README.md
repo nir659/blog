@@ -2,18 +2,10 @@
 
 A minimal, dark landing page for Markdown content built with Next.js and TypeScript.
 
-![Homepage screenshot](public/screenshots/home.png)
-
 ## Features
 - Directory-based Markdown publishing under `app/posts`
 - Live-rendered posts and dynamic archive powered by the App Router
 - Responsive, split layout with sticky archive navigation
-
-## Tech Stack
-- Next.js 16 (App Router) + TypeScript
-- React 19 client components
-- Tailwind CSS v4
-- React Markdown + `remark-gfm`
 
 ## Getting Started
 
@@ -32,30 +24,9 @@ pnpm dev
 ```
 Then open [http://localhost:3000](http://localhost:3000).
 
-**Other scripts:**
-- `pnpm build` — production build
-- `pnpm start` — run built app locally
-- `pnpm lint` — lint code
-- `pnpm test` — run Vitest suite
-
 ## Deployment
 
 Build with `pnpm build`. Deploy the `.next` output to Vercel or any Node host (`pnpm start` for production server).
-
-## Docker
-
-The app reads Markdown posts from the path in `POSTS_DIRECTORY` (default `app/posts`). When running in Docker, mount your host posts directory:
-
-```yaml
-services:
-  lab:
-    volumes:
-      - ./app/posts:/app/posts:Z
-    environment:
-      - POSTS_DIRECTORY=/app/posts
-```
-
-Posts update immediately on the website when files change since the app uses `revalidate: 0` to fetch fresh data on every request.
 
 ## Content
 
@@ -63,11 +34,6 @@ Add Markdown files to `app/posts`. Subdirectories create nested URLs.
 The first post or a file named `welcome.md` is shown by default.
 
 Post changes appear immediately on the website since the app fetches fresh data on every request.
-
-## Configuration
-
-- `SITE_URL` — Canonical site origin (e.g., `https://lab.example.com`) used for metadata, RSS, and the sitemap.
-- `PROD_URL` — Optional fallback if `SITE_URL` is not set (handy for provider-supplied URLs).
 
 ## License
 

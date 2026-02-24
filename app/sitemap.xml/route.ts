@@ -16,7 +16,7 @@ export async function GET() {
 
   const postEntries = await Promise.all(
     posts.map(async (post) => {
-      const lastmod = await getPostLastModified(post.slug);
+      const lastmod = await getPostLastModified(post.filePath);
       
       const cleanUrl = `${siteUrl}/${post.slug}`; 
 

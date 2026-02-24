@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     default: "Lab",
     template: "%s | Lab",
   },
-  description: "NIR is a dark, minimal-style Lab for Markdown content.",
+  description: "NIR is a dark, minimal-style Lab. Notes and research on various topics.",
   keywords: [
     "Lab",
     "NIR",
