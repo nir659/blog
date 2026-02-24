@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Space_Mono } from "next/font/google";
-import { HomePageClient, buildPostPath } from "@/app/components/home-page-client";
+import { HomePageClient } from "@/app/components/home-page-client";
+import { buildPostPath } from "@/app/lib/slug";
 import { getPostContent } from "@/app/lib/getPostContent";
 import { Skeleton } from "@/app/components/skeleton";
 import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";

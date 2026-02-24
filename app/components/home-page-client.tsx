@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import { memo, useCallback, useEffect, useState } from "react";
 import type { DirectoryMeta, DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
+import { buildPostPath } from "@/app/lib/slug";
 import { DirectoryPostList } from "./directory-post-list";
 import { BlogPostDisplay, type Heading } from "./blog-post-display";
 import { Main } from "./home";
@@ -83,12 +84,6 @@ function ContentArea({
       <MobileFooter />
     </section>
   );
-}
-
-export function buildPostPath(slug: string, hash?: string): string {
-  const segments = slug.split("/").map((s) => encodeURIComponent(s));
-  const path = `/${segments.join("/")}`;
-  return hash ? `${path}#${hash}` : path;
 }
 
 export function HomePageClient({

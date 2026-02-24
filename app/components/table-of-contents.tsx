@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import type { Heading } from "./blog-post-display";
-import { buildPostPath } from "./home-page-client";
+import { buildPostPath } from "@/app/lib/slug";
 
 function LinkIcon() {
   return (
