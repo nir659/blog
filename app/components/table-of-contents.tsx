@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import type { Heading } from "./blog-post-display";
+import { buildPostPath } from "@/app/lib/slug";
 
 function LinkIcon() {
   return (
@@ -57,7 +58,7 @@ export function TableOfContents({ headings, currentSlug }: TableOfContentsProps)
     if (!currentSlug) return;
     const origin = window.location.origin;
     const hash = window.location.hash;
-    const url = `${origin}/?slug=${encodeURIComponent(currentSlug)}${hash}`;
+    const url = `${origin}${buildPostPath(currentSlug)}${hash}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -161,7 +162,7 @@ export function TableOfContents({ headings, currentSlug }: TableOfContentsProps)
         element.scrollIntoView({ behavior: "smooth", block: "start" });
 
         const url = currentSlug
-          ? `/?slug=${encodeURIComponent(currentSlug)}#${id}`
+          ? `${buildPostPath(currentSlug)}#${id}`
           : `#${id}`;
         window.history.pushState(null, "", url);
 

@@ -1,6 +1,6 @@
 import { getPostLastModified } from "@/app/lib/post-paths";
 import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
-import { buildPostPermalink, getSiteUrl } from "@/app/lib/site";
+import { getSiteUrl } from "@/app/lib/site";
 
 export const dynamic = "force-static";
 export const revalidate = false;
@@ -17,21 +17,18 @@ export async function GET() {
   const postEntries = await Promise.all(
     posts.map(async (post) => {
       const lastmod = await getPostLastModified(post.slug);
+      
+      const cleanUrl = `${siteUrl}/${post.slug}`; 
+
       return {
-        loc: buildPostPermalink(post.slug),
+        loc: cleanUrl,
         lastmod: formatDate(lastmod),
       };
     })
   );
 
-  const homeLastMod =
-    postEntries.reduce<string | null>((latest, entry) => {
-      if (!latest || entry.lastmod > latest) {
-        return entry.lastmod;
-      }
-      return latest;
-    }, null) ?? new Date().toISOString();
-
+  const homeLastMod = new Date().toISOString(); 
+  
   const xml = [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

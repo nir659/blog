@@ -1,9 +1,9 @@
 "use client";
 
 import clsx from "clsx";
-import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { memo, useCallback, useEffect, useState } from "react";
 import type { DirectoryMeta, DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
+import { buildPostPath } from "@/app/lib/slug";
 import { DirectoryPostList } from "./directory-post-list";
 import { BlogPostDisplay, type Heading } from "./blog-post-display";
 import { Main } from "./home";
@@ -22,6 +22,7 @@ type HomePageClientProps = {
   navLinks: NavLink[];
   fontClassName: string;
   initialSelectedSlug: string | null;
+  initialContent?: string | null;
 };
 
 type ArchivePaneProps = {
@@ -60,12 +61,14 @@ function GridDivider({ column }: { column: number }) {
 type ContentAreaProps = {
   navLinks: NavLink[];
   selectedPostSlug: string | null;
+  initialContent?: string | null;
   onHeadingsChange: (headings: Heading[]) => void;
 };
 
 function ContentArea({
   navLinks,
   selectedPostSlug,
+  initialContent,
   onHeadingsChange,
 }: ContentAreaProps) {
   return (
@@ -74,6 +77,7 @@ function ContentArea({
       <div className="min-w-0 overflow-hidden">
         <BlogPostDisplay
           selectedPostSlug={selectedPostSlug}
+          initialContent={initialContent}
           onHeadingsChange={onHeadingsChange}
         />
       </div>
@@ -82,71 +86,27 @@ function ContentArea({
   );
 }
 
-function buildSlugUrl(slug: string, hash?: string): string {
-  const url = `/?slug=${encodeURIComponent(slug)}`;
-  return hash ? `${url}#${hash}` : url;
-}
-
 export function HomePageClient({
   rootPosts,
   directoryTree,
   navLinks,
   fontClassName,
   initialSelectedSlug,
+  initialContent,
 }: HomePageClientProps) {
-  const searchParams = useSearchParams();
   const [selectedPostSlug, setSelectedPostSlug] = useState<string | null>(
     initialSelectedSlug
   );
   const [headings, setHeadings] = useState<Heading[]>([]);
-  const isInternalNav = useRef(false);
 
   useEffect(() => {
     setSelectedPostSlug(initialSelectedSlug);
   }, [initialSelectedSlug]);
 
-  useEffect(() => {
-    if (!initialSelectedSlug) return;
-    const currentSlugParam = new URLSearchParams(window.location.search).get("slug");
-    if (!currentSlugParam) {
-      const hash = window.location.hash;
-      window.history.replaceState(null, "", buildSlugUrl(initialSelectedSlug) + hash);
-    }
-  }, [initialSelectedSlug]);
-
-  useEffect(() => {
-    if (isInternalNav.current) {
-      isInternalNav.current = false;
-      return;
-    }
-    const slugParam = searchParams.get("slug");
-    if (slugParam && slugParam !== selectedPostSlug) {
-      setSelectedPostSlug(slugParam);
-    }
-  }, [searchParams, selectedPostSlug]);
-
-  useEffect(() => {
-    const handlePopState = () => {
-      const params = new URLSearchParams(window.location.search);
-      const slugParam = params.get("slug");
-      if (slugParam) {
-        setSelectedPostSlug(slugParam);
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
-
   const handlePostSelect = useCallback((slug: string) => {
     if (selectedPostSlug === slug) return;
-    isInternalNav.current = true;
     setSelectedPostSlug(slug);
-  }, [selectedPostSlug]);
-
-  useEffect(() => {
-    if (!selectedPostSlug || !isInternalNav.current) return;
-    window.history.replaceState(null, "", buildSlugUrl(selectedPostSlug));
+    window.history.pushState(null, "", buildPostPath(slug));
   }, [selectedPostSlug]);
 
   const handleHeadingsChange = useCallback((newHeadings: Heading[]) => {
@@ -176,6 +136,7 @@ export function HomePageClient({
         <ContentArea
           navLinks={navLinks}
           selectedPostSlug={selectedPostSlug}
+          initialContent={selectedPostSlug === initialSelectedSlug ? initialContent : undefined}
           onHeadingsChange={handleHeadingsChange}
         />
         <GridDivider column={4} />
