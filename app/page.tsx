@@ -1,6 +1,9 @@
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Space_Mono } from "next/font/google";
 import { HomePageClient } from "@/app/components/home-page-client";
+import { buildPostPath } from "@/app/lib/slug";
+import { getPostContent } from "@/app/lib/getPostContent";
 import { Skeleton } from "@/app/components/skeleton";
 import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
 
@@ -16,18 +19,12 @@ const navLinks = [
   { href: "#contact", label: "Links" },
 ];
 
-export const revalidate = 0;
-
 function normalizedSlugTail(slug: string): string {
   const tail = slug.split("/").pop() ?? "";
   return tail.replace(/(\.[a-z0-9]+)+$/gi, "").toLowerCase();
 }
 
-type HomePageContentProps = {
-  initialSlugFromQuery: string | null;
-};
-
-async function HomePageContent({ initialSlugFromQuery }: HomePageContentProps) {
+async function HomePageContent() {
   const { directories, rootPosts, directoryTree } = await getPostIndex();
   const allPosts = getAllPostsFromTree(directoryTree);
 
@@ -35,17 +32,12 @@ async function HomePageContent({ initialSlugFromQuery }: HomePageContentProps) {
     (post) => normalizedSlugTail(post.slug) === "welcome"
   );
 
-  const matchesQuerySlug = initialSlugFromQuery
-    ? allPosts.some((post) => post.slug === initialSlugFromQuery)
-    : false;
-
   const firstAvailableSlug = rootPosts[0]?.slug ?? allPosts[0]?.slug ?? null;
+  const initialSelectedSlug = welcomePost?.slug ?? firstAvailableSlug ?? null;
 
-  const initialSelectedSlug =
-    (matchesQuerySlug ? initialSlugFromQuery : null) ??
-    welcomePost?.slug ??
-    firstAvailableSlug ??
-    null;
+  const initialContent = initialSelectedSlug
+    ? await getPostContent(initialSelectedSlug)
+    : null;
 
   return (
     <HomePageClient
@@ -55,6 +47,7 @@ async function HomePageContent({ initialSlugFromQuery }: HomePageContentProps) {
       navLinks={navLinks}
       fontClassName={spaceMono.className}
       initialSelectedSlug={initialSelectedSlug}
+      initialContent={initialContent}
     />
   );
 }
@@ -63,33 +56,25 @@ type HomePageProps = {
   searchParams?: Promise<{ slug?: string | string[] } | undefined>;
 };
 
-function normalizeSlugFromSearchParams(
-  value: string | string[] | undefined
-): string | null {
-  if (!value) {
-    return null;
-  }
-
-  const slugValue = Array.isArray(value) ? value[0] : value;
-
-  try {
-    const decoded = decodeURIComponent(slugValue);
-    const trimmed = decoded.trim().replace(/^\/+|\/+$/g, "");
-    return trimmed || null;
-  } catch {
-    return null;
-  }
-}
-
 export default async function HomePage({ searchParams }: HomePageProps = {}) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const slugFromQuery = normalizeSlugFromSearchParams(resolvedSearchParams?.slug);
+  const slugValue = resolvedSearchParams?.slug;
+
+  if (slugValue) {
+    const raw = Array.isArray(slugValue) ? slugValue[0] : slugValue;
+    try {
+      const decoded = decodeURIComponent(raw).trim().replace(/^\/+|\/+$/g, "");
+      if (decoded) {
+        redirect(buildPostPath(decoded));
+      }
+    } catch {
+      // bad slug, fall through to home
+    }
+  }
 
   return (
-    <Suspense
-      fallback={<HomePageSkeleton />}
-    >
-      <HomePageContent initialSlugFromQuery={slugFromQuery} />
+    <Suspense fallback={<HomePageSkeleton />}>
+      <HomePageContent />
     </Suspense>
   );
 }

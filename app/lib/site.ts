@@ -47,9 +47,6 @@ export function withSiteUrl(pathname: string): string {
 }
 
 export function buildPostPermalink(slug: string): string {
-  const url = new URL(SITE_URL);
-  url.hash = "";
-  url.search = "";
-  url.searchParams.set("slug", slug);
-  return url.toString();
+  const segments = slug.split("/").map((s) => encodeURIComponent(s));
+  return `${SITE_URL}/${segments.join("/")}`;
 }
