@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getAllPostsFromTree, getPostIndex, type DirectoryTreeNode } from "@/app/lib/posts";
+import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
 import { buildPostPath } from "@/app/lib/slug";
 
 function normalize(name: string): string {
