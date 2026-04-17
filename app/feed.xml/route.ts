@@ -1,4 +1,4 @@
-import { getPostContent } from "@/app/lib/getPostContent";
+import { getCompiledPost, getPostContent } from "@/app/lib/getPostContent";
 import { getPostLastModified } from "@/app/lib/post-paths";
 import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
 import { buildPostPermalink, getSiteUrl, withSiteUrl } from "@/app/lib/site";
@@ -43,19 +43,22 @@ export async function GET() {
 
   const entryResults = await Promise.all(
     posts.map(async (post) => {
-      const [content, updatedDate] = await Promise.all([
+      const [compiled, content, updatedDate] = await Promise.all([
+        getCompiledPost(post.filePath),
         getPostContent(post.filePath),
         getPostLastModified(post.filePath),
       ]);
 
       const body = content ?? "";
-      const summary = summarizeContent(body) || post.title;
+      const fm = compiled?.frontmatter;
+      const summary = fm?.description || summarizeContent(body) || post.title;
+      const title = fm?.title || post.title;
       const permalink = buildPostPermalink(post.slug);
       const updated = (updatedDate ?? new Date(0)).toISOString();
 
       const xml = [
         "<entry>",
-        `<title>${escapeXml(post.title)}</title>`,
+        `<title>${escapeXml(title)}</title>`,
         `<link href="${permalink}"/>`,
         `<id>${permalink}</id>`,
         `<updated>${updated}</updated>`,

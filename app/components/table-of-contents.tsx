@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
-import type { Heading } from "./blog-post-display";
+import type { HeadingData } from "@/app/lib/markdown-plugins/extract-headings";
 import { buildPostPath } from "@/app/lib/slug";
 
 function LinkIcon() {
@@ -40,13 +40,8 @@ function CheckIcon() {
 }
 
 type TableOfContentsProps = {
-  headings: Heading[];
+  headings: HeadingData[];
   currentSlug: string | null;
-};
-
-type GroupedHeading = {
-  h1: Heading;
-  h2s: Heading[];
 };
 
 export function TableOfContents({ headings, currentSlug }: TableOfContentsProps) {
@@ -65,22 +60,9 @@ export function TableOfContents({ headings, currentSlug }: TableOfContentsProps)
     });
   }, [currentSlug]);
 
-  const groupedHeadings = useMemo(() => {
-    const groups: GroupedHeading[] = [];
-    let currentGroup: GroupedHeading | null = null;
-
-    for (const heading of headings) {
-      if (heading.level === 1) {
-        currentGroup = { h1: heading, h2s: [] };
-        groups.push(currentGroup);
-      } else if (heading.level === 2 && currentGroup) {
-        currentGroup.h2s.push(heading);
-      } else if (heading.level === 2 && !currentGroup) {
-        groups.push({ h1: heading, h2s: [] });
-      }
-    }
-
-    return groups;
+  const minLevel = useMemo(() => {
+    if (headings.length === 0) return 1;
+    return Math.min(...headings.map((h) => h.level));
   }, [headings]);
 
   useEffect(() => {
@@ -174,7 +156,7 @@ export function TableOfContents({ headings, currentSlug }: TableOfContentsProps)
     [currentSlug]
   );
 
-  const hasHeadings = groupedHeadings.length > 0;
+  const hasHeadings = headings.length > 0;
 
   return (
     <nav
@@ -202,50 +184,27 @@ export function TableOfContents({ headings, currentSlug }: TableOfContentsProps)
           <p className="text-[0.85rem] uppercase tracking-[0.18em] opacity-80 mb-4">
             On This Page
           </p>
-          <ul className="flex flex-col gap-1">
-            {groupedHeadings.map((group) => {
-              const isH1Active = activeId === group.h1.id;
-              const hasActiveH2 = group.h2s.some((h2) => activeId === h2.id);
+          <ul className="flex flex-col gap-0.5">
+            {headings.map((heading) => {
+              const indent = heading.level - minLevel;
+              const isActive = activeId === heading.id;
+              const isTopLevel = indent === 0;
 
               return (
-                <li key={group.h1.id}>
+                <li key={heading.id} style={{ paddingLeft: `${indent * 0.75}rem` }}>
                   <a
-                    href={`#${group.h1.id}`}
-                    onClick={(e) => handleClick(e, group.h1.id)}
+                    href={`#${heading.id}`}
+                    onClick={(e) => handleClick(e, heading.id)}
                     className={[
-                      "block py-1 text-[0.85rem] transition-all duration-150 border-l-2 pl-3",
-                      isH1Active || hasActiveH2
+                      "block py-0.5 transition-all duration-150 border-l-2 pl-3",
+                      isTopLevel ? "text-[0.85rem]" : "text-[0.75rem]",
+                      isActive
                         ? "opacity-100 border-white/60"
-                        : "opacity-60 border-transparent hover:opacity-100 hover:border-white/30",
+                        : "opacity-50 border-transparent hover:opacity-90 hover:border-white/30",
                     ].join(" ")}
                   >
-                    {group.h1.text}
+                    {heading.text}
                   </a>
-
-                  {group.h2s.length > 0 && (
-                    <ul className="flex flex-col gap-0.5 ml-3">
-                      {group.h2s.map((h2) => {
-                        const isH2Active = activeId === h2.id;
-
-                        return (
-                          <li key={h2.id}>
-                            <a
-                              href={`#${h2.id}`}
-                              onClick={(e) => handleClick(e, h2.id)}
-                              className={[
-                                "block py-0.5 text-[0.75rem] transition-all duration-150 border-l pl-3",
-                                isH2Active
-                                  ? "opacity-100 border-white/40"
-                                  : "opacity-50 border-transparent hover:opacity-80 hover:border-white/20",
-                              ].join(" ")}
-                            >
-                              {h2.text}
-                            </a>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
                 </li>
               );
             })}

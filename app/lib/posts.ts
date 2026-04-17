@@ -1,8 +1,9 @@
 import "server-only";
 
 import type { Dirent } from "fs";
-import { readdir } from "fs/promises";
+import { readFile, readdir } from "fs/promises";
 import { join } from "path";
+import matter from "gray-matter";
 import { getPostsDirectory } from "@/app/lib/post-paths";
 
 export type PostMeta = {
@@ -97,15 +98,30 @@ async function buildDirectoryTree(pathSegments: string[]): Promise<DirectoryTree
     .filter((entry) => entry.isFile() && entry.name.endsWith(MD_EXTENSION))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const posts: PostMeta[] = files.map((file) => {
-    const baseName = file.name.slice(0, -MD_EXTENSION.length);
-    return {
-      directory: directoryValue,
-      slug: buildSlug(pathSegments, baseName),
-      filePath: buildFilePath(pathSegments, baseName),
-      title: formatTitle(baseName),
-    };
-  });
+  const posts: PostMeta[] = await Promise.all(
+    files.map(async (file) => {
+      const baseName = file.name.slice(0, -MD_EXTENSION.length);
+      const fullPath = join(POSTS_DIRECTORY, ...pathSegments, file.name);
+      let title = formatTitle(baseName);
+
+      try {
+        const raw = await readFile(fullPath, "utf-8");
+        const { data } = matter(raw);
+        if (typeof data.title === "string" && data.title.trim()) {
+          title = data.title.trim();
+        }
+      } catch {
+        // fallback to filename-derived title
+      }
+
+      return {
+        directory: directoryValue,
+        slug: buildSlug(pathSegments, baseName),
+        filePath: buildFilePath(pathSegments, baseName),
+        title,
+      };
+    }),
+  );
 
   const directories: DirectoryTreeNode[] = [];
   const subdirectories = entries

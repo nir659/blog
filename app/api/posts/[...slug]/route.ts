@@ -1,5 +1,4 @@
 import type { NextRequest } from "next/server";
-import { unstable_noStore as noStore } from "next/cache";
 import {
   buildPostContentResponse,
   createErrorResponse,
@@ -10,8 +9,6 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string[] }> }
 ) {
-  noStore();
-
   const { slug } = await params;
   const normalizedSlug = normalizeSlugParam(slug);
 

@@ -5,7 +5,7 @@ import { memo, useCallback, useEffect, useState } from "react";
 import type { DirectoryMeta, DirectoryTreeNode, PostMeta } from "@/app/lib/posts";
 import { buildPostPath } from "@/app/lib/slug";
 import { DirectoryPostList } from "./directory-post-list";
-import { BlogPostDisplay, type Heading } from "./blog-post-display";
+import { BlogPostDisplay, type Heading, type CompiledBundle } from "./blog-post-display";
 import { Main } from "./home";
 import { SiteFooter, MobileFooter } from "./site-footer";
 import { TableOfContents } from "./table-of-contents";
@@ -22,7 +22,7 @@ type HomePageClientProps = {
   navLinks: NavLink[];
   fontClassName: string;
   initialSelectedSlug: string | null;
-  initialContent?: string | null;
+  initialCompiled?: CompiledBundle | null;
 };
 
 type ArchivePaneProps = {
@@ -61,14 +61,14 @@ function GridDivider({ column }: { column: number }) {
 type ContentAreaProps = {
   navLinks: NavLink[];
   selectedPostSlug: string | null;
-  initialContent?: string | null;
+  initialCompiled?: CompiledBundle | null;
   onHeadingsChange: (headings: Heading[]) => void;
 };
 
 function ContentArea({
   navLinks,
   selectedPostSlug,
-  initialContent,
+  initialCompiled,
   onHeadingsChange,
 }: ContentAreaProps) {
   return (
@@ -77,7 +77,7 @@ function ContentArea({
       <div className="min-w-0 overflow-hidden">
         <BlogPostDisplay
           selectedPostSlug={selectedPostSlug}
-          initialContent={initialContent}
+          initialCompiled={initialCompiled}
           onHeadingsChange={onHeadingsChange}
         />
       </div>
@@ -92,7 +92,7 @@ export function HomePageClient({
   navLinks,
   fontClassName,
   initialSelectedSlug,
-  initialContent,
+  initialCompiled,
 }: HomePageClientProps) {
   const [selectedPostSlug, setSelectedPostSlug] = useState<string | null>(
     initialSelectedSlug
@@ -136,7 +136,7 @@ export function HomePageClient({
         <ContentArea
           navLinks={navLinks}
           selectedPostSlug={selectedPostSlug}
-          initialContent={selectedPostSlug === initialSelectedSlug ? initialContent : undefined}
+          initialCompiled={selectedPostSlug === initialSelectedSlug ? initialCompiled : undefined}
           onHeadingsChange={handleHeadingsChange}
         />
         <GridDivider column={4} />
