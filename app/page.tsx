@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { Space_Mono } from "next/font/google";
 import { HomePageClient } from "@/app/components/home-page-client";
 import { buildPostPath } from "@/app/lib/slug";
-import { getPostContent } from "@/app/lib/getPostContent";
+import { getCompiledPost } from "@/app/lib/getPostContent";
 import { Skeleton } from "@/app/components/skeleton";
 import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
 
@@ -36,8 +36,12 @@ async function HomePageContent() {
   const initialPost = welcomePost ?? firstAvailable ?? null;
   const initialSelectedSlug = initialPost?.slug ?? null;
 
-  const initialContent = initialPost
-    ? await getPostContent(initialPost.filePath)
+  const compiled = initialPost
+    ? await getCompiledPost(initialPost.filePath)
+    : null;
+
+  const initialCompiled = compiled
+    ? { html: compiled.html, headings: compiled.headings, frontmatter: compiled.frontmatter }
     : null;
 
   return (
@@ -48,7 +52,7 @@ async function HomePageContent() {
       navLinks={navLinks}
       fontClassName={spaceMono.className}
       initialSelectedSlug={initialSelectedSlug}
-      initialContent={initialContent}
+      initialCompiled={initialCompiled}
     />
   );
 }

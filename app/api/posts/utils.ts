@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPostContent } from "@/app/lib/getPostContent";
+import { getCompiledPost } from "@/app/lib/getPostContent";
 import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
 
 type SlugParam = string | string[] | undefined;
@@ -34,16 +34,22 @@ export async function buildPostContentResponse(slug: string) {
     return createErrorResponse("Post not found", 404);
   }
 
-  const content = await getPostContent(post.filePath);
+  const compiled = await getCompiledPost(post.filePath);
 
-  if (!content) {
+  if (!compiled) {
     return createErrorResponse("Post not found", 404);
   }
 
-  return new NextResponse(content, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "no-store",
+  return NextResponse.json(
+    {
+      html: compiled.html,
+      headings: compiled.headings,
+      frontmatter: compiled.frontmatter,
     },
-  });
+    {
+      headers: {
+        "Cache-Control": "public, max-age=60, must-revalidate",
+      },
+    },
+  );
 }

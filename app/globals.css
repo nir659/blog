@@ -1,9 +1,13 @@
 @import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
 :root {
   color-scheme: dark;
   --background: #0b0b0b;
   --foreground: #ffffff;
   --grid-lines: rgb(35, 35, 35);
+  --callout-bg: rgba(255, 255, 255, 0.04);
+  --callout-border: rgba(255, 255, 255, 0.12);
 }
 
 html {
@@ -67,6 +71,8 @@ a {
   scrollbar-width: thin;
   scrollbar-color: var(--grid-lines) transparent;
 }
+
+/* ── Syntax highlighting (One Dark-inspired) ── */
 
 .hljs {
   background: transparent;
@@ -141,27 +147,359 @@ a {
   font-weight: bold;
 }
 
-pre {
-  max-width: 100%;
-  overflow-x: auto;
+/* ── Note body: article typography ── */
+
+.note-body {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  min-width: 0;
+  line-height: 1.7;
+  font-size: 0.95rem;
 }
 
-pre code {
+.note-body h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+  scroll-margin-top: 1.5rem;
+}
+
+.note-body h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  scroll-margin-top: 1.5rem;
+}
+
+.note-body h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.35;
+  scroll-margin-top: 1.5rem;
+}
+
+.note-body h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  scroll-margin-top: 1.5rem;
+}
+
+.note-body h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  scroll-margin-top: 1.5rem;
+}
+
+.note-body h6 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.8;
+  scroll-margin-top: 1.5rem;
+}
+
+.note-body p {
+  margin-bottom: 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.note-body a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.15s;
+}
+
+.note-body a:hover {
+  opacity: 0.7;
+}
+
+.note-body strong {
+  font-weight: 600;
+}
+
+.note-body em {
+  font-style: italic;
+}
+
+.note-body del {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* ── Lists ── */
+
+.note-body ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.note-body ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.note-body li {
+  margin-bottom: 0.25rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.note-body li > ul,
+.note-body li > ol {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* task list */
+.note-body .task-list-item {
+  list-style: none;
+  margin-left: -1.5rem;
+  padding-left: 0;
+}
+
+.note-body .task-list-item input[type="checkbox"] {
+  margin-right: 0.5rem;
+  accent-color: white;
+  pointer-events: none;
+}
+
+/* ── Inline code ── */
+
+.note-body code:not(pre code) {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.15em 0.35em;
+  font-size: 0.9em;
+  border-radius: 3px;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+/* ── Code blocks ── */
+
+.note-body pre {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  max-width: 100%;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.note-body pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
   white-space: pre;
   word-wrap: normal;
   overflow-wrap: normal;
   display: block;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-.prose {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  min-width: 0;
+.code-block-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
 }
 
-.prose p,
-.prose li,
-.prose blockquote {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+.code-block-wrapper pre {
+  margin-bottom: 0;
+}
+
+/* ── Blockquote ── */
+
+.note-body blockquote {
+  border-left: 2px solid var(--grid-lines);
+  padding-left: 1rem;
+  font-style: italic;
+  opacity: 0.8;
+  margin: 1rem 0;
+}
+
+.note-body blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Horizontal rule ── */
+
+.note-body hr {
+  border: none;
+  border-top: 1px solid var(--grid-lines);
+  margin: 2rem 0;
+}
+
+/* ── Tables ── */
+
+.note-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+  display: block;
+}
+
+.note-body thead {
+  border-bottom: 1px solid var(--grid-lines);
+}
+
+.note-body tr {
+  border-bottom: 1px solid var(--grid-lines);
+}
+
+.note-body tr:last-child {
+  border-bottom: none;
+}
+
+.note-body th {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.note-body td {
+  padding: 0.5rem 0.75rem;
+}
+
+/* ── Images ── */
+
+.note-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+/* ── Heading anchor links ── */
+
+.heading-anchor {
+  opacity: 0;
+  margin-left: 0.5rem;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  font-weight: 400;
+}
+
+.heading-anchor-icon {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8em;
+}
+
+.note-body h1:hover .heading-anchor,
+.note-body h2:hover .heading-anchor,
+.note-body h3:hover .heading-anchor,
+.note-body h4:hover .heading-anchor,
+.note-body h5:hover .heading-anchor,
+.note-body h6:hover .heading-anchor {
+  opacity: 1;
+}
+
+/* ── Highlights (==text==) ── */
+
+.note-body mark {
+  background: rgba(255, 230, 0, 0.25);
+  color: inherit;
+  padding: 0.1em 0.2em;
+  border-radius: 2px;
+}
+
+/* ── Callouts ── */
+
+.callout {
+  border-left: 3px solid var(--callout-border);
+  background: var(--callout-bg);
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  border-radius: 4px;
+  font-style: normal;
+}
+
+.callout .callout-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  text-transform: capitalize;
+  font-size: 0.9rem;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout-note {
+  border-left-color: #5b9bd5;
+}
+
+.callout-info {
+  border-left-color: #5b9bd5;
+}
+
+.callout-tip {
+  border-left-color: #6bc76b;
+}
+
+.callout-warning {
+  border-left-color: #e5c07b;
+}
+
+.callout-danger {
+  border-left-color: #e06c75;
+}
+
+.callout-important {
+  border-left-color: #c678dd;
+}
+
+.callout-caution {
+  border-left-color: #e5c07b;
+}
+
+/* ── Unresolved wikilinks ── */
+
+.wikilink-unresolved {
+  color: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+  cursor: help;
+}
+
+/* ── Footnotes ── */
+
+.note-body .footnotes {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--grid-lines);
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.note-body .footnotes ol {
+  padding-left: 1.25rem;
+}
+
+.note-body sup a {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* ── KaTeX overrides ── */
+
+.note-body .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
 }

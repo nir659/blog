@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getAllPostsFromTree, getPostIndex } from "@/app/lib/posts";
-import { getPostContent } from "@/app/lib/getPostContent";
+import { getCompiledPost } from "@/app/lib/getPostContent";
 import { HomePageClient } from "@/app/components/home-page-client";
 import { getSiteUrl } from "@/app/lib/site";
 import { Space_Mono } from "next/font/google";
@@ -44,14 +44,19 @@ export async function generateMetadata({
 
   if (!post) return {};
 
-  const title = `${post.title} | NIR Lab`;
+  const compiled = await getCompiledPost(post.filePath);
+  const fm = compiled?.frontmatter;
+
+  const title = fm?.title || post.title;
+  const displayTitle = `${title} | NIR Lab`;
+  const description = fm?.description || `Engineering notes and research on ${title}.`;
   const url = `${getSiteUrl()}/${slugString}`;
 
   return {
-    title,
-    description: `Engineering notes and research on ${post.title}.`,
+    title: displayTitle,
+    description,
     alternates: { canonical: url },
-    openGraph: { title, url, type: "article" },
+    openGraph: { title: displayTitle, description, url, type: "article" },
   };
 }
 
@@ -69,12 +74,12 @@ export default async function NotePage({
   const post = allPosts.find((p) => p.slug === slugString);
   if (!post) notFound();
 
-  const content = await getPostContent(post.filePath);
+  const compiled = await getCompiledPost(post.filePath);
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    headline: slugString.split("/").pop()?.replace(/-/g, " "),
+    headline: compiled?.frontmatter?.title || slugString.split("/").pop()?.replace(/-/g, " "),
     url: `${getSiteUrl()}/${slugString}`,
     author: {
       "@type": "Person",
@@ -96,7 +101,7 @@ export default async function NotePage({
         navLinks={navLinks}
         fontClassName={spaceMono.className}
         initialSelectedSlug={slugString}
-        initialContent={content}
+        initialCompiled={compiled ? { html: compiled.html, headings: compiled.headings, frontmatter: compiled.frontmatter } : null}
       />
     </>
   );
